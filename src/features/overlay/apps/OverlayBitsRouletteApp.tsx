@@ -23,6 +23,7 @@ import {
     parseSpinBannerParts
 } from '@/features/alerts/lib/bitsRouletteUrl';
 import { playBitsConfettiSound, unlockBitsConfettiAudio } from '@/features/alerts/lib/bitsConfettiSound';
+import { safeOverlayUrlColor } from '@/features/overlay/lib/overlayAppearance';
 import { resolveWheelPalette } from '@/features/tools/roulette/lib/wheelUtils';
 
 function optionsToChatters(options: string[]): RouletteUser[] {
@@ -364,12 +365,8 @@ function OverlayBitsRouletteContent({ session }: { session: Session }) {
         );
     }
 
-    const urlColor =
-        typeof window !== 'undefined'
-            ? new URLSearchParams(window.location.search).get('color') ||
-              new URLSearchParams(window.location.search).get('theme')
-            : undefined;
-    const bannerPalette = resolveWheelPalette(urlColor || undefined);
+    const urlColor = safeOverlayUrlColor();
+    const bannerPalette = resolveWheelPalette(urlColor);
     const spinBannerParts =
         urlConfig.spinBanner && display.lastCheer
             ? parseSpinBannerParts(

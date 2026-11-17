@@ -2,6 +2,7 @@ import { CONFIG } from '../../core/config/env';
 import { MESSAGES } from '../../core/config/messages';
 import { logger } from '../../core/utils/logger';
 import { AppError } from '../../core/errors/AppError';
+import { sanitizeBotChatOutput } from '../commands/commandTemplates';
 import { MAGIC8_REASONING_RULES, buildMagic8UserMessage } from './magic8Question';
 import { MAGIC8_MOODS, resolveMagic8Mood } from './magic8Moods';
 
@@ -102,7 +103,8 @@ export async function generateMagic8Response(
 
         const rawContent = completion.choices[0]?.message?.content || fallback;
 
-        const finalContent = sanitizeMentions(rawContent, userName);
+        const mentioned = sanitizeMentions(rawContent, userName);
+        const finalContent = sanitizeBotChatOutput(mentioned);
 
         const result = finalContent.length > 390 ? finalContent.substring(0, 387) + '...' : finalContent;
 

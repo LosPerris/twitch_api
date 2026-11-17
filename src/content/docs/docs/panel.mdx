@@ -62,7 +62,7 @@ Usa el botón **Feedback** del header del panel para enviar sugerencias o report
 Tras el login con Twitch, el panel canjea un código de un solo uso y deja una cookie de sesión:
 
 1. **OAuth** → redirect a `/dashboard/?auth=…`
-2. **`GET /api/auth/exchange`** → establece cookie HttpOnly `lp_sess` y perfil básico (sin devolver la API Key)
+2. **`POST /api/auth/exchange`** → establece cookie HttpOnly `lp_sess` y perfil básico (sin devolver la API Key)
 3. **`GET /api/system/validate`** → confirma la cookie y refresca el token de Twitch en servidor si hace falta
 
 La API Key se obtiene bajo demanda en **Configuración → Seguridad** (revelar / copiar / regenerar).

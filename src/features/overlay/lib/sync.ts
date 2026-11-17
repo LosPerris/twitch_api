@@ -104,10 +104,11 @@ export async function fetchOverlayLink(
         debugWarn('[overlay] fetchOverlayLink failed:', err);
     }
 
-    // Fallback elegante para entorno local si el backend no está disponible
+    // Fallback local: nunca meter apiKey en la URL. Solo overlayToken (OBS) si ya está en sesión.
     if (typeof window !== 'undefined') {
         const base = `${window.location.origin}/overlay/${tool}/`;
-        return session.apiKey ? `${base}?key=${encodeURIComponent(session.apiKey)}` : base;
+        const token = session.overlayToken?.trim();
+        return token ? `${base}?overlayToken=${encodeURIComponent(token)}` : base;
     }
     return null;
 }

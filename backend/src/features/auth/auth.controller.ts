@@ -135,7 +135,8 @@ export const callback = async (req: Request, res: Response) => {
 };
 
 export const exchange = async (req: Request, res: Response) => {
-    const auth = safeString(req.body?.auth) || safeString(req.query.auth);
+    // Solo body: ?auth= filtraría en logs/referrers; el panel ya envía JSON { auth }.
+    const auth = safeString(req.body?.auth);
 
     if (!auth) {
         return jsonError(res, 400, 'Falta el token de autenticación.', { code: 'MISSING_AUTH' });

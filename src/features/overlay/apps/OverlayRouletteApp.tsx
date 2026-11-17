@@ -5,6 +5,7 @@ import { OverlayAppearanceRoot } from '@/features/overlay/components/OverlayAppe
 import { OverlayConnectionBanners } from '@/features/overlay/components/OverlayConnectionBanners';
 import { OverlaySessionGate } from '@/features/overlay/components/OverlaySessionGate';
 import { OverlaySessionProvider } from '@/features/overlay/components/OverlaySessionProvider';
+import { isOverlayColorValue, safeOverlayUrlColor } from '@/features/overlay/lib/overlayAppearance';
 import { ErrorBoundary } from '@/shared/ui/ErrorBoundary';
 import type { RouletteOverlayState } from '@/features/overlay/lib/types';
 import type { Session } from '@/core/config/config';
@@ -19,8 +20,12 @@ function OverlayRouletteContent({ session }: { session: Session }) {
         return <div className="min-h-screen" aria-hidden />;
     }
 
-    const urlColor = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('color') || new URLSearchParams(window.location.search).get('theme') : undefined;
-    const effectiveColor = rouletteState.wheelColor || urlColor || undefined;
+    const urlColor = safeOverlayUrlColor();
+    const stateColor =
+        rouletteState.wheelColor && isOverlayColorValue(rouletteState.wheelColor)
+            ? rouletteState.wheelColor
+            : undefined;
+    const effectiveColor = stateColor || urlColor || undefined;
 
     return (
         <OverlayAppearanceRoot>

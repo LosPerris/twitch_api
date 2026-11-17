@@ -39,6 +39,13 @@ export function parseOverlayAppearance(search = ''): OverlayAppearance {
     return { color, scale, scaleValue: OVERLAY_SCALE_VALUES[scale] };
 }
 
+/** color/theme de la query solo si pasan el allowlist (evita CSS raro en color-mix). */
+export function safeOverlayUrlColor(search = typeof window !== 'undefined' ? window.location.search : ''): string | undefined {
+    const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+    const raw = (params.get('color') || params.get('theme') || '').trim();
+    return isOverlayColorValue(raw) ? raw : undefined;
+}
+
 function colorToCssHex(color: string): string | null {
     if (HEX_RE.test(color)) return color;
     const preset = ROULETTE_COLOR_PRESETS.find((item) => item.id === color);

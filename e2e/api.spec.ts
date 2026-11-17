@@ -31,7 +31,10 @@ test.describe('API (Express real)', () => {
     });
 
     test('auth exchange rechaza petición sin token', async ({ request }) => {
-        const res = await request.get(`${API}/api/auth/exchange`);
+        const res = await request.post(`${API}/api/auth/exchange`, {
+            headers: { Origin: 'http://127.0.0.1:4321' },
+            data: {}
+        });
         expect(res.status()).toBe(400);
 
         const body = (await res.json()) as {
@@ -42,6 +45,11 @@ test.describe('API (Express real)', () => {
         expect(body.success).toBe(false);
         expect(body.error.code).toBe('MISSING_AUTH');
         expect(body.error.message.length).toBeGreaterThan(0);
+    });
+
+    test('GET /auth/exchange ya no existe (anti login CSRF)', async ({ request }) => {
+        const res = await request.get(`${API}/api/auth/exchange`);
+        expect([404, 405]).toContain(res.status());
     });
 
     test('followage con apiKey inválida responde texto plano HTTP 200 (Nightbot)', async ({

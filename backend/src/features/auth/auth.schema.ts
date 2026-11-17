@@ -35,10 +35,8 @@ export const callbackSchema = z.object({
 const authExchangeToken = z.string().min(20).max(4096).optional();
 
 export const exchangeSchema = z.object({
-    query: z.object({
-        auth: authExchangeToken
-    }),
-    /** POST: el token no viaja en la query (logs de acceso). GET sigue aceptando ?auth= */
+    query: z.object({}).optional(),
+    /** Solo body — nunca ?auth= (access logs / Referer). */
     body: z
         .object({
             auth: authExchangeToken

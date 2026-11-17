@@ -1,4 +1,7 @@
-import { fillTemplate } from '../../backend/src/features/commands/commandTemplates';
+import {
+    fillTemplate,
+    sanitizeBotChatOutput
+} from '../../backend/src/features/commands/commandTemplates';
 
 describe('fillTemplate', () => {
     it('sustituye variables de los comandos de bot', () => {
@@ -25,5 +28,13 @@ describe('fillTemplate', () => {
 
     it('quita saltos de línea para que no se cuele un segundo mensaje', () => {
         expect(fillTemplate('hola {user}', { user: 'ana\n/ban pepe' })).toBe('hola ana/ban pepe');
+    });
+});
+
+describe('sanitizeBotChatOutput', () => {
+    it('neutraliza comandos de mod al inicio (Magic8 / bots)', () => {
+        const out = sanitizeBotChatOutput('/timeout victim 600 reason');
+        expect(out.trimStart().startsWith('/')).toBe(false);
+        expect(out).toContain('timeout victim 600 reason');
     });
 });

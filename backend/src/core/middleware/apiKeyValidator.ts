@@ -126,13 +126,13 @@ export const apiKeyValidator = async (req: Request, res: Response, next: NextFun
         }
         try {
             const user = await dbService.getUser(payload.userId);
-            if (user?.isActive !== false) {
-                res.locals.apiUser = toOverlayApiUser(payload);
-                res.locals.isOverlayReadRequest = true;
-                res.locals.overlayTool = payload.tool;
-                return next();
+            if (!user || user.isActive === false) {
+                return res.status(403).json({ error: 'Cuenta suspendida o no encontrada.' });
             }
-            return res.status(403).json({ error: 'Cuenta suspendida o no encontrada.' });
+            res.locals.apiUser = toOverlayApiUser(payload);
+            res.locals.isOverlayReadRequest = true;
+            res.locals.overlayTool = payload.tool;
+            return next();
         } catch (e) {
             logger.error('Error validando overlay token:', e);
             return res.status(503).json({ error: 'Servicio no disponible temporalmente.' });

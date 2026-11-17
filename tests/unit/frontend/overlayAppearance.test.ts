@@ -1,7 +1,8 @@
 import {
     appendOverlayAppearanceParams,
     overlayAppearanceStyle,
-    parseOverlayAppearance
+    parseOverlayAppearance,
+    safeOverlayUrlColor
 } from '@/features/overlay/lib/overlayAppearance';
 
 describe('overlayAppearance', () => {
@@ -36,5 +37,12 @@ describe('overlayAppearance', () => {
         }) as Record<string, unknown>;
         expect(style.zoom).toBe(1.25);
         expect(style['--primary']).toBe('#00ff66');
+    });
+
+    it('safeOverlayUrlColor acepta hex/preset y rechaza CSS raro', () => {
+        expect(safeOverlayUrlColor('?color=%239146ff')).toBe('#9146ff');
+        expect(safeOverlayUrlColor('?theme=purple')).toBe('purple');
+        expect(safeOverlayUrlColor('?color=%23ff007f%3Bbackground%3Aurl(x)')).toBeUndefined();
+        expect(safeOverlayUrlColor('?color=red)%20url(evil)')).toBeUndefined();
     });
 });

@@ -324,7 +324,8 @@ export const getChatters = async (
     moderatorId: string,
     token: string
 ): Promise<{ user_id: string; user_login: string; user_name: string }[]> => {
-    const cacheKey = `cache:chatters:${broadcasterId}`;
+    // Incluye moderatorId: un hit no debe saltarse el ACL de Helix de otro caller.
+    const cacheKey = `cache:chatters:${broadcasterId}:mod:${moderatorId}`;
     try {
         const cached =
             await cacheService.get<{ user_id: string; user_login: string; user_name: string }[]>(

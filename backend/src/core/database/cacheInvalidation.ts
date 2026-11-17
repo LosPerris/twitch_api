@@ -14,14 +14,20 @@ export async function invalidateHelixUserCaches(userId: string, login?: string):
         `cache:eligibility:vips:${userId}`,
         `cache:eligibility:subs:${userId}`,
         `twitch:channel:${userId}`,
-        `cache:chatters:${userId}`
+        // Legacy + canal propio como moderador
+        `cache:chatters:${userId}`,
+        `cache:chatters:${userId}:mod:${userId}`
     ];
     if (login) {
         keys.push(`cache:userId:${login.toLowerCase()}`);
     }
-    await Promise.allSettled(keys.map((key) => cacheService.del(key))).catch((e) =>
-        logger.warn('Error invalidando caches Helix:', e)
-    );
+    await Promise.allSettled([
+        ...keys.map((key) => cacheService.del(key)),
+        // Scoped writes: cache:chatters:{broadcaster}:mod:{moderator}
+        cacheService.delByMatch(`cache:chatters:${userId}:mod:*`),
+        cacheService.delByMatch(`cache:chatters:*:mod:${userId}`),
+        cacheService.delByMatch(`cache:cmd:getChatters:*:owner:${userId}`)
+    ]).catch((e) => logger.warn('Error invalidando caches Helix:', e));
 }
 
 export async function invalidateOverlayStateCaches(userId: string): Promise<void> {

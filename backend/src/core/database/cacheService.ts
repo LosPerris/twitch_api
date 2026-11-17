@@ -217,6 +217,45 @@ export const del = async (key: string): Promise<void> => {
     }
 };
 
+const KV_KEY_PREFIX = 'twitch_api:';
+
+/**
+ * Borra claves KV que coinciden con un glob Redis (sin prefijo twitch_api:).
+ * Best-effort: si SCAN no está disponible, no falla la petición.
+ */
+export const delByMatch = async (match: string, maxKeys = 200): Promise<void> => {
+    if (!match || !isKvWriteAvailable()) return;
+    try {
+        let cursor: number | string = 0;
+        let deleted = 0;
+        do {
+            const result = (await kv.scan(cursor, {
+                match: `${KV_KEY_PREFIX}${match}`,
+                count: 50
+            })) as [string | number, string[]];
+            const next = result[0];
+            const keys = Array.isArray(result[1]) ? result[1] : [];
+            for (const fullKey of keys) {
+                if (deleted >= maxKeys) break;
+                const logical = fullKey.startsWith(KV_KEY_PREFIX)
+                    ? fullKey.slice(KV_KEY_PREFIX.length)
+                    : fullKey;
+                l1Del(logical);
+                await kv.del(fullKey);
+                deleted += 1;
+            }
+            cursor = next;
+            if (deleted >= maxKeys) break;
+        } while (String(cursor) !== '0');
+    } catch (error) {
+        if (process.env.NODE_ENV !== 'production') {
+            disableKvWrites('KV scan/delByMatch falló');
+            return;
+        }
+        console.error('[Cache] Error KV delByMatch:', { match, error });
+    }
+};
+
 export type SensitiveGetResult<T> =
     | { status: 'ok'; value: T | null }
     | { status: 'unavailable'; value: null };

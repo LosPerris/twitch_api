@@ -36,6 +36,36 @@ function getRawBody(req: Request): Buffer {
 /** Más largo que la ventana de 10 min, para que un replay no entre al caducar el dedup. */
 const DEDUP_TTL_SEC = 60 * 60;
 
+/** Estados de subscription.status en revocaciones reales de Twitch (cuerpo firmado). */
+const EVENTSUB_REVOCATION_STATUSES = new Set([
+    'authorization_revoked',
+    'user_removed',
+    'notification_failures_exceeded',
+    'version_removed'
+]);
+
+async function claimEventSubMessageId(
+    messageId: string,
+    res: Response
+): Promise<'ok' | 'done'> {
+    const claim = await setIfAbsent(dedupKey(messageId), '1', DEDUP_TTL_SEC);
+    if (claim === 'exists') {
+        res.status(204).end();
+        return 'done';
+    }
+    if (claim === 'unavailable') {
+        if (process.env.NODE_ENV === 'production') {
+            res.status(503).end();
+            return 'done';
+        }
+        if (!devClaim(messageId)) {
+            res.status(204).end();
+            return 'done';
+        }
+    }
+    return 'ok';
+}
+
 const devSeen = new Map<string, number>();
 
 function devClaim(messageId: string): boolean {
@@ -98,15 +128,32 @@ export async function twitchEventSubWebhook(req: Request, res: Response) {
 
     if (headers.messageType === 'revocation') {
         const sub = body.subscription as
-            | { type?: string; condition?: { broadcaster_user_id?: string } }
+            | {
+                  status?: string;
+                  type?: string;
+                  condition?: { broadcaster_user_id?: string };
+              }
             | undefined;
-        const broadcasterUserId = sub?.condition?.broadcaster_user_id || '';
-        logger.warn('EventSub revocation', { type: sub?.type, broadcasterUserId });
+        // Message-Type no va en el HMAC: exigir status de revocación firmado en el body
+        // (una notification channel.cheer suele traer status=enabled y no debe revocar).
+        if (!sub?.status || !EVENTSUB_REVOCATION_STATUSES.has(sub.status)) {
+            return res.status(204).end();
+        }
+        if ((await claimEventSubMessageId(headers.id, res)) === 'done') return;
+
+        const broadcasterUserId = sub.condition?.broadcaster_user_id || '';
+        logger.warn('EventSub revocation', {
+            type: sub.type,
+            status: sub.status,
+            broadcasterUserId
+        });
         if (broadcasterUserId) {
             try {
                 await revokeBitsAlertSubscription(broadcasterUserId);
             } catch (err) {
                 logger.error('EventSub revocation persist', err);
+                await cacheDel(dedupKey(headers.id));
+                devSeen.delete(headers.id);
                 return res.status(500).end();
             }
         }
@@ -117,17 +164,10 @@ export async function twitchEventSubWebhook(req: Request, res: Response) {
         return res.status(204).end();
     }
 
-    const claim = await setIfAbsent(dedupKey(headers.id), '1', DEDUP_TTL_SEC);
-    if (claim === 'exists') return res.status(204).end();
-    if (claim === 'unavailable') {
-        if (process.env.NODE_ENV === 'production') return res.status(503).end();
-        if (!devClaim(headers.id)) return res.status(204).end();
-    }
+    if ((await claimEventSubMessageId(headers.id, res)) === 'done') return;
 
-    const subType =
-        headers.subscriptionType ||
-        (body.subscription as { type?: string } | undefined)?.type ||
-        '';
+    // Preferir type del cuerpo firmado; el header Subscription-Type no está en el HMAC.
+    const subType = (body.subscription as { type?: string } | undefined)?.type || '';
 
     if (subType === 'channel.cheer') {
         const event = (body.event || {}) as {

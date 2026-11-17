@@ -13,8 +13,7 @@ const router = express.Router();
 router.get('/twitch', authRateLimiter, validate(loginSchema), authController.login);
 // codeql[js/missing-rate-limiting]
 router.get('/twitch/callback', authRateLimiter, validate(callbackSchema), authController.callback);
-// codeql[js/missing-rate-limiting]
-router.get('/exchange', authRateLimiter, validate(exchangeSchema), authController.exchange);
+// Solo POST: GET permitiría login CSRF (Set-Cookie sin Origin). El panel usa POST + CSRF.
 // codeql[js/missing-rate-limiting]
 router.post('/exchange', authRateLimiter, csrfProtection, validate(exchangeSchema), authController.exchange);
 // codeql[js/missing-rate-limiting]

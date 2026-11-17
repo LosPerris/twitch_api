@@ -26,6 +26,11 @@ function neutralizeModCommand(message: string): string {
     return `${lead}\u2060${trimmed}`;
 }
 
+/** Salida lista para Nightbot/SE: controles + anti-comando de mod. */
+export function sanitizeBotChatOutput(message: string): string {
+    return neutralizeModCommand(stripChatControls(message));
+}
+
 export const fillTemplate = (templateRaw: string, variables: Record<string, string>): string => {
     let output = stripChatControls(templateRaw);
     for (const [name, value] of Object.entries(variables)) {

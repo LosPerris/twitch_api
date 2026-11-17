@@ -47,7 +47,7 @@ También puedes enviar la clave en la cabecera `X-Api-Key` en lugar del query pa
 Los bots **no** necesitan iniciar sesión en el panel: solo la API Key. El panel usa OAuth además de la clave para rutas `/api/dashboard/*`.
 
 <Aside type="note" title="Primera API Key">
-  La clave se genera automáticamente en tu primer login con Twitch (`GET /api/auth/exchange`). Si la regeneras, la anterior deja de funcionar de inmediato.
+  La clave se genera automáticamente en tu primer login con Twitch (`POST /api/auth/exchange`). Si la regeneras, la anterior deja de funcionar de inmediato.
 </Aside>
 
 ---

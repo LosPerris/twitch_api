@@ -2,6 +2,7 @@ import { Response } from 'express';
 import * as authService from './auth.service';
 import * as dbService from '../../core/database/dbService';
 import * as apiService from '../twitch/twitch.service';
+import { CONFIG } from '../../core/config/env';
 import { MESSAGES } from '../../core/config/messages';
 import { logger } from '../../core/utils/logger';
 import { jsonError } from '../../core/utils/jsonResponse';
@@ -9,6 +10,10 @@ import { isAuthenticationError } from '../../core/errors/AppError';
 
 import { AuthenticatedRequest } from '../../types/twitch';
 import { resolveTwitchScopes } from './twitchScopes.service';
+
+function isTokenForThisTwitchApp(clientId: unknown): boolean {
+    return typeof clientId === 'string' && clientId.length > 0 && clientId === CONFIG.TWITCH_CLIENT_ID;
+}
 
 /** Respuesta de validate al panel: sin secretos; renovación usa tokenExpiresAt + cookie. */
 function panelValidatePayload(params: {
@@ -106,7 +111,7 @@ export const validateToken = async (req: AuthenticatedRequest, res: Response) =>
         }
 
         const validation = await apiService.validateToken(token);
-        if (!validation) {
+        if (!validation || !isTokenForThisTwitchApp(validation.client_id)) {
             return jsonError(res, 401, MESSAGES.AUTH.INVALID_TOKEN);
         }
 

@@ -105,7 +105,8 @@ describe('systemController', () => {
 
             (apiService.validateToken as jest.Mock).mockResolvedValue({
                 login: 'testuser',
-                user_id: '123'
+                user_id: '123',
+                client_id: process.env.TWITCH_CLIENT_ID || 'test_id'
             });
             (dbService.getUserByLogin as jest.Mock).mockResolvedValue({
                 userId: '123',
@@ -154,6 +155,22 @@ describe('systemController', () => {
             await validateToken(req, res);
 
             expect(res.status).toHaveBeenCalledWith(401);
+        });
+
+        it('should return 401 if token belongs to another Twitch client_id', async () => {
+            const req = mockReq();
+            const res = mockRes();
+
+            (apiService.validateToken as jest.Mock).mockResolvedValue({
+                login: 'testuser',
+                user_id: '123',
+                client_id: 'foreign_app_client_id'
+            });
+
+            await validateToken(req, res);
+
+            expect(res.status).toHaveBeenCalledWith(401);
+            expect(apiService.getUserInfo).not.toHaveBeenCalled();
         });
     });
 

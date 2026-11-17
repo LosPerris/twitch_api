@@ -4,6 +4,7 @@ import { AuthenticatedRequest, StoredUser } from '../../types/twitch';
 import * as apiService from '../../features/twitch/twitch.service';
 import * as dbService from '../database/dbService';
 import * as cacheService from '../database/cacheService';
+import { CONFIG } from '../config/env';
 import { MESSAGES } from '../config/messages';
 import { logger } from '../utils/logger';
 import { isPublicRoute, isApiRoute, isJsonApiRoute, isOAuthCallbackRoute } from '../utils/routeHelpers';
@@ -26,10 +27,15 @@ import {
 const CACHE_TTL = 10 * 60 * 1000;
 const TOKEN_VALIDATION_TTL = 10 * 60 * 1000;
 
-/** Fingerprint del bearer — nunca guardar el token en claro en Redis. */
+/** Fingerprint del bearer — nunca guardar el token en claro en Redis. v2: solo tras bind de client_id. */
 function tokenValidationCacheKey(token: string): string {
     const hash = crypto.createHash('sha256').update(token, 'utf8').digest('hex');
-    return `cache:tokenValidation:${hash}`;
+    return `cache:tokenValidation:v2:${hash}`;
+}
+
+/** Tokens Helix/OAuth deben pertenecer a esta app Twitch (no a otra client_id). */
+export function isTokenForThisTwitchApp(clientId: unknown): boolean {
+    return typeof clientId === 'string' && clientId.length > 0 && clientId === CONFIG.TWITCH_CLIENT_ID;
 }
 const LAST_ACTIVE_THROTTLE_MS = 30 * 60 * 1000;
 
@@ -283,7 +289,7 @@ const checkToken = async (req: AuthenticatedRequest, res: Response, next: NextFu
             if (!req.userId || !req.login) {
                 try {
                     const validation = await apiService.validateToken(token);
-                    if (validation) {
+                    if (validation && isTokenForThisTwitchApp(validation.client_id)) {
                         if (validation.user_id) req.userId = validation.user_id;
                         if (validation.login) req.login = validation.login;
                         invalidTokensCache.delete(token);

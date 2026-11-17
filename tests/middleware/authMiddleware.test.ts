@@ -69,7 +69,11 @@ describe('authMiddleware — checkToken', () => {
         const res = mockRes();
         const req = mockReq({ query: { token: 'valid_token' } });
 
-        mockValidateToken.mockResolvedValue({ user_id: 'u2', login: 'strm2' });
+        mockValidateToken.mockResolvedValue({
+            user_id: 'u2',
+            login: 'strm2',
+            client_id: process.env.TWITCH_CLIENT_ID
+        });
         mockGetUser.mockResolvedValue({ userId: 'u2', login: 'strm2', isActive: true });
 
         await checkToken(req, res, next);
@@ -111,7 +115,11 @@ describe('authMiddleware — checkToken', () => {
         const res = mockRes();
         const req = mockReq({ headers: { authorization: 'Bearer bearer_token' } });
 
-        mockValidateToken.mockResolvedValue({ user_id: 'u3', login: 'strm3' });
+        mockValidateToken.mockResolvedValue({
+            user_id: 'u3',
+            login: 'strm3',
+            client_id: process.env.TWITCH_CLIENT_ID
+        });
         mockGetUser.mockResolvedValue({ userId: 'u3', login: 'strm3', isActive: true });
 
         await checkToken(req, res, next);
@@ -120,11 +128,31 @@ describe('authMiddleware — checkToken', () => {
         expect(next).toHaveBeenCalled();
     });
 
+    it('rechaza Bearer si client_id no es el de esta app', async () => {
+        const res = mockRes();
+        const req = mockReq({ headers: { authorization: 'Bearer foreign_token' } });
+
+        mockValidateToken.mockResolvedValue({
+            user_id: 'u3',
+            login: 'strm3',
+            client_id: 'other-twitch-app'
+        });
+
+        await checkToken(req, res, next);
+
+        expect(res.status).toHaveBeenCalledWith(401);
+        expect(next).not.toHaveBeenCalled();
+    });
+
     it('rechaza con 403 si el usuario Bearer está suspendido', async () => {
         const res = mockRes();
         const req = mockReq({ headers: { authorization: 'Bearer suspended_token' } });
 
-        mockValidateToken.mockResolvedValue({ user_id: 'u4', login: 'strm4' });
+        mockValidateToken.mockResolvedValue({
+            user_id: 'u4',
+            login: 'strm4',
+            client_id: process.env.TWITCH_CLIENT_ID
+        });
         mockGetUser.mockResolvedValue({ userId: 'u4', login: 'strm4', isActive: false });
 
         await checkToken(req, res, next);
