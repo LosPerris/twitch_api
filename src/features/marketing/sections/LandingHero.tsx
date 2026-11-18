@@ -270,8 +270,8 @@ export function LandingHero({ legacyReloginNotice, onLoginClick }: LandingHeroPr
                                         key={item.id}
                                         src={staticPath(item.src)}
                                         alt={hT.tabs[item.id].label}
-                                        width={1912}
-                                        height={918}
+                                        width={1920}
+                                        height={967}
                                         fetchPriority={i === 0 ? 'high' : 'low'}
                                         loading="eager"
                                         decoding="async"

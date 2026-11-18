@@ -15,7 +15,7 @@
 <br />
 
 <div align="center">
-  <img src="./public/img/og-banner.png" alt="Dashboard Preview" width="800" style="border-radius: 8px;" />
+  <img src="./public/img/readme/landing-hero.webp" alt="Landing and dashboard preview" width="800" />
 </div>
 
 <br />
@@ -29,6 +29,7 @@ This repository serves as a **technical showcase** of software architecture, sec
 ## Table of Contents
 
 - [Feature Set](#comprehensive-feature-set)
+- [Screenshots](#screenshots)
 - [System Architecture](#system-architecture)
 - [Security Implementation](#security-implementation)
 - [Testing & CI/CD](#testing--cicd-pipeline)
@@ -48,6 +49,43 @@ Unlike standard chat bots, this project is a complete platform that acts as the 
 | **Interactive Minigames** | Chat modules (Magic 8, Russian Roulette, Duel) plus panel tools (roulette giveaways, trends, stalker, questions). |
 | **OBS Integration** | Transparent browser sources for roulette, trends, and questions, synced via overlay tokens. |
 | **Bot Integration** | URL templates for Nightbot, StreamElements, Fossabot, Wizebot, and Streamlabs; watchtime reads StreamElements public points when available. |
+
+### Screenshots
+
+Live product at [ttv.losperris.dev](https://ttv.losperris.dev/). The signed-in dashboard requires Twitch OAuth; these shots show the real panel (commands, tools, alerts, and minigames).
+
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./public/img/readme/commands.webp" alt="Followage command generator in the dashboard" width="400" />
+      <br />
+      <em>Commands — Followage generator</em>
+    </td>
+    <td align="center" width="50%">
+      <img src="./public/img/readme/tools.webp" alt="Tendencias tool in the dashboard" width="400" />
+      <br />
+      <em>Tools — Tendencias and OBS overlays</em>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="./public/img/readme/minigames.webp" alt="Magic 8 Ball minigame in the dashboard" width="400" />
+      <br />
+      <em>Minigames — Magic 8 Ball</em>
+    </td>
+    <td align="center" width="50%">
+      <img src="./public/img/readme/alerts.webp" alt="Bits Roulette alerts panel" width="400" />
+      <br />
+      <em>Alerts — Ruleta Bits</em>
+    </td>
+  </tr>
+</table>
+
+<p align="center">
+  <img src="./public/img/readme/dashboard-home.webp" alt="Dashboard home with activity feed and quick links" width="800" />
+  <br />
+  <em>Home — activity feed and quick links</em>
+</p>
 
 ---
 

@@ -12,10 +12,10 @@ export const landingBtnHeader =
 
 /** Estructura visual del hero; copy en `t.landing.hero.tabs`. */
 export const PRODUCT_TABS = [
-    { id: 'inicio' as const, src: '/img/ss/home.png' },
-    { id: 'comandos' as const, src: '/img/ss/comando.png' },
-    { id: 'herramientas' as const, src: '/img/ss/herramientas.png' },
-    { id: 'minijuegos' as const, src: '/img/ss/minijuego.png' }
+    { id: 'inicio' as const, src: '/img/ss/home.webp' },
+    { id: 'comandos' as const, src: '/img/ss/commands.webp' },
+    { id: 'herramientas' as const, src: '/img/ss/tools.webp' },
+    { id: 'minijuegos' as const, src: '/img/ss/minigames.webp' }
 ];
 
 /** Pasos; copy en `t.landing.features.steps`. */
