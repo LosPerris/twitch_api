@@ -261,7 +261,7 @@ describe('authController', () => {
         });
 
         it('should return 401 if auth token is invalid or expired', async () => {
-            const req = mockReq({ query: { auth: 'bad-token' } });
+            const req = mockReq({ body: { auth: 'bad-token' } });
             const res = mockRes();
 
             (authService.verifyAuthExchange as jest.Mock).mockReturnValue(null);
@@ -279,7 +279,7 @@ describe('authController', () => {
         });
 
         it('should return 401 if auth token was already consumed', async () => {
-            const req = mockReq({ query: { auth: 'used-token' } });
+            const req = mockReq({ body: { auth: 'used-token' } });
             const res = mockRes();
 
             (authService.verifyAuthExchange as jest.Mock).mockReturnValue({
@@ -296,6 +296,20 @@ describe('authController', () => {
             expect(res.json).toHaveBeenCalledWith({
                 success: false,
                 error: expect.objectContaining({ code: 'AUTH_ALREADY_USED' })
+            });
+        });
+
+        it('ignores exchange token in query string (body only)', async () => {
+            const req = mockReq({ query: { auth: 'query-token' }, body: {} });
+            const res = mockRes();
+
+            await exchange(req, res);
+
+            expect(authService.verifyAuthExchange).not.toHaveBeenCalled();
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({
+                success: false,
+                error: expect.objectContaining({ code: 'MISSING_AUTH' })
             });
         });
 
@@ -320,7 +334,7 @@ describe('authController', () => {
         });
 
         it('should return session payload for valid auth token', async () => {
-            const req = mockReq({ query: { auth: 'valid-token' } });
+            const req = mockReq({ body: { auth: 'valid-token' } });
             const res = mockRes();
 
             (authService.verifyAuthExchange as jest.Mock).mockReturnValue({
@@ -347,7 +361,7 @@ describe('authController', () => {
         });
 
         it('should return 503 if auth exchange store is unavailable', async () => {
-            const req = mockReq({ query: { auth: 'valid-token' } });
+            const req = mockReq({ body: { auth: 'valid-token' } });
             const res = mockRes();
 
             (authService.verifyAuthExchange as jest.Mock).mockReturnValue({
