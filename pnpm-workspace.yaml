@@ -57,7 +57,7 @@ auditConfig:
 
 minimumReleaseAgeExclude:
   - '@astrojs/markdown-satteri@0.4.1'
-  - astro@7.3.2 || 7.3.3
+  - astro@7.3.2 || 7.3.3 || 7.4.12
   - brace-expansion@1.1.21 || 2.1.7 || 5.0.12
   - body-parser@2.4.0
   - compression@1.8.2
