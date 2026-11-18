@@ -51,6 +51,9 @@ auditConfig:
     - GHSA-mh99-v99m-4gvg
     # deepmerge: sin release parchado; solo jest-config (dev). CVE disputado/rechazado.
     - GHSA-gcqx-w48m-w2h4
+    # picomatch ReDoS (GHSA-fc5q-39xc-vjpf): patched versions = None (npm latest 4.0.7).
+    # Solo tooling de build/dev (astro, @astrojs/*, jest/anymatch). Sin override posible.
+    - GHSA-fc5q-39xc-vjpf
 
 minimumReleaseAgeExclude:
   - '@astrojs/markdown-satteri@0.4.1'

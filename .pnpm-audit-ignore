@@ -4,5 +4,8 @@
   },
   "GHSA-7p8r-x3mc-p8w7": {
     "reason": "Vulnerability in transitive devDependency yaml-language-server (used solely by @astrojs/check at build time, not in production runtime bundle)."
+  },
+  "GHSA-fc5q-39xc-vjpf": {
+    "reason": "picomatch ReDoS: no patched npm release yet (affected <=4.0.7, latest is 4.0.7). Transitive build/dev only via Astro/Jest. Ignored in pnpm-workspace.yaml auditConfig until upstream ships a fix."
   }
 }
