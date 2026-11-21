@@ -31,9 +31,25 @@ export function getOverlayStoredSession(): Session | null {
     }
 }
 
+/** Quita overlayToken de la barra de URL tras persistirlo (menos fuga por Referer/historial). */
+export function stripOverlayTokenFromUrl(): void {
+    if (typeof window === 'undefined') return;
+    try {
+        const url = new URL(window.location.href);
+        if (!url.searchParams.has('overlayToken')) return;
+        url.searchParams.delete('overlayToken');
+        const qs = url.searchParams.toString();
+        const next = qs ? `${url.pathname}?${qs}${url.hash}` : `${url.pathname}${url.hash}`;
+        window.history.replaceState({}, '', next);
+    } catch {
+        /* ignore */
+    }
+}
+
 export function saveOverlayStoredSession(session: Session): void {
     if (typeof window === 'undefined') return;
     sessionStorage.setItem(OVERLAY_SESSION_KEY, JSON.stringify(session));
+    if (session.overlayToken) stripOverlayTokenFromUrl();
 }
 
 export function clearOverlayStoredSession(): void {

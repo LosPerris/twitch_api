@@ -1,5 +1,6 @@
 import { get as cacheGet, setPersistent } from '../../core/database/cacheService';
 import { logger } from '../../core/utils/logger';
+import { normalizePublicHttpsImageUrl } from '../../core/utils/validationHelpers';
 import type { EventAlertKind, EventAlertSubscription, EventReactionMode } from './eventAlert.types';
 
 export function eventAlertSubKey(userId: string, kind: EventAlertKind): string {
@@ -42,7 +43,7 @@ export async function getEventAlertSubscription(
                 typeof row.messageTemplate === 'string' && row.messageTemplate.trim()
                     ? row.messageTemplate.trim().slice(0, 500)
                     : DEFAULT_MESSAGE[kind],
-            imageUrl: typeof row.imageUrl === 'string' ? row.imageUrl.trim().slice(0, 500) : '',
+            imageUrl: normalizePublicHttpsImageUrl(row.imageUrl),
             updatedAt: typeof row.updatedAt === 'string' ? row.updatedAt : undefined
         };
     } catch (err) {
@@ -72,7 +73,10 @@ export async function saveEventAlertSubscription(
             patch.messageTemplate !== undefined
                 ? patch.messageTemplate.trim().slice(0, 500) || DEFAULT_MESSAGE[kind]
                 : current.messageTemplate,
-        imageUrl: patch.imageUrl !== undefined ? patch.imageUrl.trim().slice(0, 500) : current.imageUrl,
+        imageUrl:
+            patch.imageUrl !== undefined
+                ? normalizePublicHttpsImageUrl(patch.imageUrl)
+                : current.imageUrl,
         updatedAt: new Date().toISOString()
     };
     await setPersistent(eventAlertSubKey(userId, kind), next);

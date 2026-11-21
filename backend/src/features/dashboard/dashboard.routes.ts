@@ -40,6 +40,7 @@ router.get(
 
 router.patch(
     '/settings',
+    requireCookieSession,
     globalRateLimiter,
     csrfProtection,
     validate(updateSettingsSchema),

@@ -24,3 +24,26 @@ export const sanitizeHtml = (input: string): string => {
     };
     return input.replace(/[&<>"']/g, (char) => map[char] || char);
 };
+
+const PUBLIC_HTTPS_IMAGE_MAX = 500;
+
+/** URL pública https para imágenes de alertas/overlays (sin fetch server-side). */
+export function isPublicHttpsImageUrl(raw: string, maxLen = PUBLIC_HTTPS_IMAGE_MAX): boolean {
+    const url = raw.trim();
+    if (!url || url.length > maxLen || !url.startsWith('https://')) return false;
+    try {
+        return new URL(url).protocol === 'https:';
+    } catch {
+        return false;
+    }
+}
+
+export function normalizePublicHttpsImageUrl(
+    raw: unknown,
+    maxLen = PUBLIC_HTTPS_IMAGE_MAX
+): string {
+    const url = String(raw ?? '')
+        .trim()
+        .slice(0, maxLen);
+    return isPublicHttpsImageUrl(url, maxLen) ? url : '';
+}

@@ -3,6 +3,10 @@ import { z } from 'zod';
 import type { AuthenticatedRequest } from '../../types/twitch';
 import { jsonError } from '../../core/utils/jsonResponse';
 import { MESSAGES } from '../../core/config/messages';
+import {
+    isPublicHttpsImageUrl,
+    normalizePublicHttpsImageUrl
+} from '../../core/utils/validationHelpers';
 import { EVENT_ALERT_KINDS } from './eventAlert.types';
 import {
     disableEventAlert,
@@ -18,7 +22,14 @@ export const eventAlertPutSchema = z.object({
         enabled: z.boolean().optional(),
         reactionMode: z.enum(['message', 'image']).optional(),
         messageTemplate: z.string().trim().max(500).optional(),
-        imageUrl: z.string().trim().max(500).optional()
+        imageUrl: z
+            .string()
+            .trim()
+            .max(500)
+            .optional()
+            .refine((v) => v === undefined || v === '' || isPublicHttpsImageUrl(v), {
+                message: 'imageUrl must be a public https URL'
+            })
     })
 });
 
@@ -58,7 +69,10 @@ export const putEventAlertHandler = async (req: AuthenticatedRequest, res: Respo
             await saveEventAlertConfig(userId, kind, {
                 reactionMode: body.reactionMode,
                 messageTemplate: body.messageTemplate,
-                imageUrl: body.imageUrl
+                imageUrl:
+                    body.imageUrl !== undefined
+                        ? normalizePublicHttpsImageUrl(body.imageUrl)
+                        : undefined
             });
         }
 
