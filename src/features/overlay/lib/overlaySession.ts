@@ -31,7 +31,6 @@ export function getOverlayStoredSession(): Session | null {
     }
 }
 
-/** Quita overlayToken de la barra de URL tras persistirlo (menos fuga por Referer/historial). */
 export function stripOverlayTokenFromUrl(): void {
     if (typeof window === 'undefined') return;
     try {

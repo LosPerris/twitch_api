@@ -43,7 +43,6 @@ function decodeBase64UrlJson(token: string): string {
     return new TextDecoder().decode(bytes);
 }
 
-/** Solo CDN de Twitch: el payload del token no se firma en cliente. */
 function isTwitchCdnAvatarUrl(url: string): boolean {
     try {
         const parsed = new URL(url);
@@ -56,10 +55,6 @@ function isTwitchCdnAvatarUrl(url: string): boolean {
     }
 }
 
-/**
- * Avatar desde payload del overlayToken solo si es CDN Twitch.
- * Preferir siempre profile_image_url de overlay-exchange / sesión verificada.
- */
 function channelAvatarFromOverlayToken(token?: string): string | null {
     if (!token) return null;
     try {
