@@ -33,7 +33,7 @@ export function SettingsView({ active = true }: { active?: boolean }) {
                 />
             </SettingsTabPanel>
 
-            <SettingsTabPanel id="datos" active={s.settingsTab}>
+            <SettingsTabPanel id="data" active={s.settingsTab}>
                 <SettingsDataPanel
                     profile={s.profile}
                     exportLoading={s.exportLoading}
@@ -42,7 +42,7 @@ export function SettingsView({ active = true }: { active?: boolean }) {
                 />
             </SettingsTabPanel>
 
-            <SettingsTabPanel id="seguridad" active={s.settingsTab}>
+            <SettingsTabPanel id="security" active={s.settingsTab}>
                 <SettingsSecurityPanel
                     apiKey={s.apiKeyDisplay}
                     keyVisible={s.keyVisible}
@@ -61,7 +61,7 @@ export function SettingsView({ active = true }: { active?: boolean }) {
                 />
             </SettingsTabPanel>
 
-            <SettingsTabPanel id="conexiones" active={s.settingsTab}>
+            <SettingsTabPanel id="connections" active={s.settingsTab}>
                 <SettingsConnectionsPanel
                     discordId={s.profile?.discordId}
                     discordUsername={s.profile?.discordUsername}

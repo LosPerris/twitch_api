@@ -33,7 +33,7 @@ describe('dashboardTabUrl', () => {
         expect(parseTabFromPathname(`${BASE}/`)).toBe('home');
         expect(parseTabFromPathname(BASE)).toBe('home');
         expect(parseTabFromPathname(`${BASE}/roulette`)).toBe('roulette');
-        expect(parseTabFromPathname(`${BASE}/settings/conexiones`)).toBe('settings');
+        expect(parseTabFromPathname(`${BASE}/settings/connections`)).toBe('settings');
         expect(parseTabFromPathname(`${BASE}/bits/roulette`)).toBe('bitsRoulette');
         expect(parseTabFromPathname(`${BASE}/bitsRoulette`)).toBe('bitsRoulette');
         expect(parseTabFromPathname(`${BASE}/bits/unknown`)).toBeNull();
@@ -56,13 +56,16 @@ describe('dashboardTabUrl', () => {
 describe('settingsPaths', () => {
     it('builds and parses settings sub-paths', () => {
         expect(settingsTabPath('general')).toBe(`${BASE}/settings`);
-        expect(settingsTabPath('seguridad')).toBe(`${BASE}/settings/seguridad`);
-        expect(settingsTabPath('conexiones')).toBe(`${BASE}/settings/conexiones`);
+        expect(settingsTabPath('security')).toBe(`${BASE}/settings/security`);
+        expect(settingsTabPath('connections')).toBe(`${BASE}/settings/connections`);
+        expect(settingsTabPath('data')).toBe(`${BASE}/settings/data`);
 
         expect(parseSettingsTabFromLocation(`${BASE}/settings`, '')).toBe('general');
-        expect(parseSettingsTabFromLocation(`${BASE}/settings/seguridad`, '')).toBe('seguridad');
-        expect(parseSettingsTabFromLocation(`${BASE}/settings/conexiones`, '')).toBe('conexiones');
-        expect(parseSettingsTabFromLocation(`${BASE}/settings`, '?s=conexiones')).toBe('conexiones');
+        expect(parseSettingsTabFromLocation(`${BASE}/settings/security`, '')).toBe('security');
+        expect(parseSettingsTabFromLocation(`${BASE}/settings/connections`, '')).toBe('connections');
+        expect(parseSettingsTabFromLocation(`${BASE}/settings/data`, '')).toBe('data');
+        expect(parseSettingsTabFromLocation(`${BASE}/settings/seguridad`, '')).toBeNull();
+        expect(parseSettingsTabFromLocation(`${BASE}/settings`, '?s=connections')).toBe('connections');
         expect(parseSettingsTabFromLocation(`${BASE}/analytics`, '')).toBeNull();
     });
 });

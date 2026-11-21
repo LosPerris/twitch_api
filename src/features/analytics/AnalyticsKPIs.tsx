@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { Zap, CheckCircle2, Gauge, Command } from 'lucide-react';
 import { AnimatedNumber } from '@/shared/ui/AnimatedNumber';
 import { hoverSubtleChip } from '@/core/utils/tw';
@@ -35,24 +35,77 @@ function RangeToggle({
         { id: '7d', label: t.analytics.kpis.sevenDays },
         { id: '30d', label: t.analytics.kpis.thirtyDays }
     ];
+    const groupRef = useRef<HTMLDivElement>(null);
+    const btnRefs = useRef<Array<HTMLButtonElement | null>>([]);
+    const [pill, setPill] = useState<{ top: number; left: number; width: number; height: number } | null>(
+        null
+    );
+    const [smoothPill, setSmoothPill] = useState(false);
+
+    useLayoutEffect(() => {
+        const group = groupRef.current;
+        if (!group) return;
+
+        const measure = () => {
+            const idx = options.findIndex((opt) => opt.id === timeRange);
+            const btn = btnRefs.current[idx];
+            if (!btn) return;
+            setPill({
+                top: btn.offsetTop,
+                left: btn.offsetLeft,
+                width: btn.offsetWidth,
+                height: btn.offsetHeight
+            });
+        };
+
+        measure();
+        const raf = window.requestAnimationFrame(() => setSmoothPill(true));
+        const ro = new ResizeObserver(measure);
+        ro.observe(group);
+        return () => {
+            window.cancelAnimationFrame(raf);
+            ro.disconnect();
+        };
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- labels estables; pill sigue timeRange
+    }, [timeRange, t.analytics.kpis.today, t.analytics.kpis.sevenDays, t.analytics.kpis.thirtyDays]);
 
     return (
         <div
-            className="grid grid-cols-3 rounded-lg border border-border-subtle bg-bg-main p-0.5"
+            ref={groupRef}
+            className="relative grid grid-cols-3 rounded-lg border border-border-subtle bg-bg-main p-0.5"
             role="group"
             aria-label={t.analytics.rangeGroup}
         >
-            {options.map((opt) => {
+            {pill ? (
+                <span
+                    aria-hidden
+                    className={`pointer-events-none absolute z-0 rounded-md bg-primary/20 motion-reduce:transition-none ${
+                        smoothPill
+                            ? 'transition-[top,left,width,height] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]'
+                            : ''
+                    }`}
+                    style={{
+                        top: pill.top,
+                        left: pill.left,
+                        width: pill.width,
+                        height: pill.height
+                    }}
+                />
+            ) : null}
+            {options.map((opt, i) => {
                 const pressed = timeRange === opt.id;
                 return (
                     <button
                         key={opt.id}
                         type="button"
+                        ref={(el) => {
+                            btnRefs.current[i] = el;
+                        }}
                         onClick={() => setTimeRange(opt.id)}
                         aria-pressed={pressed}
                         className={`relative z-10 rounded-md px-2.5 py-1 text-xs transition-colors duration-200 ${
                             pressed
-                                ? 'bg-primary/20 font-semibold text-brand-text'
+                                ? 'font-semibold text-brand-text'
                                 : `font-medium text-text-muted ${hoverSubtleChip}`
                         }`}
                     >

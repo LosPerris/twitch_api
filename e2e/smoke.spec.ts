@@ -253,7 +253,7 @@ test.describe('dashboard', () => {
                 })
             })
         );
-        await gotoAuthenticatedDashboard(page, '/dashboard/settings/seguridad/');
+        await gotoAuthenticatedDashboard(page, '/dashboard/settings/security/');
 
         await expect(page.getByRole('tab', { name: 'Seguridad' })).toHaveAttribute(
             'aria-selected',
@@ -301,7 +301,7 @@ test.describe('dashboard', () => {
                 })
             })
         );
-        await gotoAuthenticatedDashboard(page, '/dashboard/settings/datos/');
+        await gotoAuthenticatedDashboard(page, '/dashboard/settings/data/');
 
         await expect(page.getByRole('tab', { name: 'Datos' })).toHaveAttribute(
             'aria-selected',

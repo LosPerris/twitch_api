@@ -79,7 +79,7 @@ export function useSettingsProfile({
                 setLoading(false);
             }
         }
-    // eslint-disable-next-line
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- carga inicial una vez
     }, []);
 
     useEffect(() => {

@@ -16,10 +16,10 @@ import { useToast } from '@/shared/ui/toast/ToastProvider';
 import { useDashboardPanel } from '@/features/dashboard/providers/DashboardPanelProvider';
 import { copyText } from '@/core/utils/clipboard';
 import {
-    isSettingsTabId,
     parseSettingsTabFromLocation,
     readInitialSettingsTab,
     rememberSettingsTab,
+    isSettingsTabId,
     writeSettingsTabUrl,
     SETTINGS_TAB_STORAGE_KEY,
     type SettingsTabId
@@ -81,8 +81,8 @@ export function useSettingsController(active: boolean) {
         t,
         syncProfile,
         onDiscordReturn: () => {
-            setSettingsTab('conexiones');
-            rememberSettingsTab('conexiones');
+            setSettingsTab('connections');
+            rememberSettingsTab('connections');
         }
     });
 
@@ -99,8 +99,8 @@ export function useSettingsController(active: boolean) {
         const syncFromLocation = () => {
             const params = new URLSearchParams(window.location.search);
             if (params.get('discord')) {
-                setSettingsTab('conexiones');
-                rememberSettingsTab('conexiones');
+                setSettingsTab('connections');
+                rememberSettingsTab('connections');
                 return;
             }
             const fromPath = parseSettingsTabFromLocation();

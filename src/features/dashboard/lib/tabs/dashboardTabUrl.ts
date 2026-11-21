@@ -126,7 +126,7 @@ function readSavedSettingsSubTab(): SettingsTabId | null {
 
 /**
  * Resuelve la pestaña activa: path > hash legacy > ?tab= > última visitada (solo en /dashboard).
- * `/dashboard/settings/conexiones` sigue resolviendo a `settings`.
+ * `/dashboard/settings/connections` sigue resolviendo a `settings`.
  */
 export function resolveDashboardTab(
     search = typeof window !== 'undefined' ? window.location.search : '',

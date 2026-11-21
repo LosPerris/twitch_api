@@ -75,7 +75,7 @@ export function useSettingsDiscord({
 
         params.delete('discord');
         params.delete('s');
-        const path = settingsTabPath('conexiones');
+        const path = settingsTabPath('connections');
         const qs = params.toString();
         window.history.replaceState({}, '', `${path}${qs ? `?${qs}` : ''}${window.location.hash}`);
 
