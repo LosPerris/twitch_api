@@ -75,13 +75,22 @@ export function writeSidebarSectionsPref(sections: Record<CollapsibleNavCategory
     }
 }
 
+/** Inicio / Analíticas / Reportes siempre arriba: no se fijan como favoritos. */
+const NON_FAVORITE_TABS = new Set<DashboardTab>(['home', 'analytics', 'reports']);
+
+export function canFavoriteTab(id: DashboardTab): boolean {
+    return !NON_FAVORITE_TABS.has(id);
+}
+
 export function readSidebarFavoritesPref(): DashboardTab[] {
     try {
         const raw = localStorage.getItem(SIDEBAR_FAVORITES_PREF);
         if (!raw) return [];
         const parsed = JSON.parse(raw) as unknown;
         if (!Array.isArray(parsed)) return [];
-        return parsed.filter((id): id is DashboardTab => typeof id === 'string');
+        return parsed.filter(
+            (id): id is DashboardTab => typeof id === 'string' && canFavoriteTab(id as DashboardTab)
+        );
     } catch {
         return [];
     }
@@ -89,7 +98,8 @@ export function readSidebarFavoritesPref(): DashboardTab[] {
 
 export function writeSidebarFavoritesPref(favorites: DashboardTab[]): void {
     try {
-        localStorage.setItem(SIDEBAR_FAVORITES_PREF, JSON.stringify(favorites.slice(0, 8)));
+        const cleaned = favorites.filter(canFavoriteTab).slice(0, 8);
+        localStorage.setItem(SIDEBAR_FAVORITES_PREF, JSON.stringify(cleaned));
     } catch {
         /* ignore */
     }

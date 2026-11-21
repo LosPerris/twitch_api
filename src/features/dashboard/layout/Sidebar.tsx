@@ -1,9 +1,10 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { DashboardTab } from '@/core/config/config';
 import { staticPath } from '@/core/config/paths';
 import { NAV_ITEMS, type NavItem } from '@/features/dashboard/lib/tabs/dashboardTabs';
 import {
     COLLAPSIBLE_NAV_CATEGORIES,
+    canFavoriteTab,
     isCollapsibleNavCategory,
     readSidebarFavoritesPref,
     readSidebarSectionsPref,
@@ -118,17 +119,52 @@ export function Sidebar({
     const favoriteItems = useMemo(
         () =>
             favorites
+                .filter(canFavoriteTab)
                 .map((id) => MAIN_NAV.find((item) => item.id === id))
                 .filter((item): item is NavItem => Boolean(item)),
         [favorites]
     );
     const toggleFavorite = (id: DashboardTab) => {
+        if (!canFavoriteTab(id)) return;
         setFavorites((prev) => {
-            const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id].slice(0, 8);
+            const next = prev.includes(id)
+                ? prev.filter((x) => x !== id)
+                : [...prev, id].filter(canFavoriteTab).slice(0, 8);
             writeSidebarFavoritesPref(next);
             return next;
         });
     };
+
+    const favoritesBlock =
+        !railCollapsed && !queryNorm && favoriteItems.length > 0 ? (
+            <div className="mb-1 mt-2">
+                <div className="mx-3 mb-2 h-px bg-border-subtle" aria-hidden />
+                <p className="mb-1 px-3 text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-text-muted">
+                    {t.sidebar.favorites}
+                </p>
+                <div className="min-h-0 border-l border-border-subtle ml-3.5 pl-1">
+                    {favoriteItems.map((item) => {
+                        const isActive = active === item.id;
+                        const itemLabel = t.sidebar.items[item.id as keyof typeof t.sidebar.items];
+                        return (
+                            <button
+                                key={`fav-${item.id}`}
+                                type="button"
+                                onClick={() => {
+                                    onChange(item.id);
+                                    onClose();
+                                }}
+                                className={`${sidebarNavItem(isActive, false, Boolean(navPill))} relative z-[1] w-full`}
+                                aria-current={isActive ? 'page' : undefined}
+                            >
+                                <IconMd icon={item.icon} />
+                                <span className={sidebarLabelClip(false)}>{itemLabel}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            </div>
+        ) : null;
     const displayName = session.displayName ?? session.login ?? 'Streamer';
     const loginLabel =
         session.login && session.login.toLowerCase() !== (session.displayName ?? '').toLowerCase()
@@ -359,35 +395,6 @@ export function Sidebar({
                                 }}
                             />
                         ) : null}
-                        {!railCollapsed && !queryNorm && favoriteItems.length > 0 ? (
-                            <div className="mb-2">
-                                <p className="mb-1 px-3 text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-text-muted">
-                                    {t.sidebar.favorites}
-                                </p>
-                                {favoriteItems.map((item) => {
-                                    const isActive = active === item.id;
-                                    const itemLabel =
-                                        t.sidebar.items[item.id as keyof typeof t.sidebar.items];
-                                    return (
-                                        <button
-                                            key={`fav-${item.id}`}
-                                            type="button"
-                                            onClick={() => {
-                                                onChange(item.id);
-                                                onClose();
-                                            }}
-                                            className={`${sidebarNavItem(isActive, false, Boolean(navPill))} relative z-[1]`}
-                                            aria-current={isActive ? 'page' : undefined}
-                                        >
-                                            <IconMd icon={item.icon} />
-                                            <span className={sidebarLabelClip(false)}>
-                                                {itemLabel}
-                                            </span>
-                                        </button>
-                                    );
-                                })}
-                            </div>
-                        ) : null}
                         {queryNorm && filteredNav.length === 0 ? (
                             <p className="px-3 py-2 text-[0.75rem] text-text-muted">
                                 {t.sidebar.noSearchResults}
@@ -411,7 +418,8 @@ export function Sidebar({
                                 prevCategory === 'general';
 
                             return (
-                                <div key={group.category || `group-${groupIndex}`}>
+                                <Fragment key={group.category || `group-${groupIndex}`}>
+                                <div>
                                     {groupIndex > 0 && railCollapsed ? (
                                         <div
                                             className={`mx-auto my-2.5 h-px w-5 bg-border-subtle transition-[margin,opacity] ${SIDEBAR_MOTION}`}
@@ -534,7 +542,9 @@ export function Sidebar({
                                                             </span>
                                                         </div>
                                                     </button>
-                                                    {!railCollapsed && !inertSection ? (
+                                                    {!railCollapsed &&
+                                                    !inertSection &&
+                                                    canFavoriteTab(item.id) ? (
                                                         <button
                                                             type="button"
                                                             className={`absolute top-1/2 right-1.5 z-[2] -translate-y-1/2 rounded p-1 text-text-muted opacity-0 transition group-hover/nav:opacity-100 ${
@@ -567,6 +577,8 @@ export function Sidebar({
                                         </div>
                                     </div>
                                 </div>
+                                {group.category === 'general' ? favoritesBlock : null}
+                                </Fragment>
                             );
                         })}
                     </div>
