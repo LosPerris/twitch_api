@@ -41,11 +41,6 @@ const getFallbackAuth = async (req: AuthenticatedRequest) => {
         return null;
     }
 };
-
-// ==========================================
-// Bola 8 Mágica
-// ==========================================
-
 export const askMagic8 = async (req: AuthenticatedRequest, res: Response) => {
     res.setHeader('Content-Type', 'text/plain; charset=utf-8');
     try {
@@ -54,7 +49,6 @@ export const askMagic8 = async (req: AuthenticatedRequest, res: Response) => {
         let user = safeString(req.query.user);
         if (user?.includes('$(') || user?.includes('${')) user = 'Anónimo';
 
-        // Fallback para tracking si no hay sesión
         let effectiveUserId = req.userId;
         if (!effectiveUserId) {
             const fallback = await getFallbackAuth(req);
@@ -88,11 +82,6 @@ export const askMagic8 = async (req: AuthenticatedRequest, res: Response) => {
         return res.status(500).send(MESSAGES.MAGIC8.GROQ_ERROR);
     }
 };
-
-// ==========================================
-// Ruleta Rusa
-// ==========================================
-
 export const playRussian = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const { channel, hardcore, format } = req.query;
@@ -153,11 +142,6 @@ export const playRussian = async (req: AuthenticatedRequest, res: Response) => {
         res.status(500).send(MESSAGES.COMMANDS.RUSSIAN_ERROR);
     }
 };
-
-// ==========================================
-// Duelo
-// ==========================================
-
 export const startDuel = async (req: AuthenticatedRequest, res: Response) => {
     try {
         const target = safeString(req.query.target);
@@ -212,11 +196,6 @@ export const startDuel = async (req: AuthenticatedRequest, res: Response) => {
         res.status(500).send(MESSAGES.COMMANDS.DUEL_ERROR);
     }
 };
-
-// ==========================================
-// Slots
-// ==========================================
-
 export const playSlots = async (req: AuthenticatedRequest, res: Response) => {
     try {
         let user = safeString(req.query.user);

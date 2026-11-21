@@ -29,7 +29,6 @@ const envSchema = z.object({
     DISCORD_REDIRECT_URI: z.string().url().optional(),
     GROQ_API_KEY: z.string().optional(),
     BASE_URL: z.string().url().default('https://ttv.losperris.dev/api'),
-    // Admin vars removed
     SUPABASE_URL: z.string().url().min(1, 'SUPABASE_URL es obligatorio'),
     SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, 'SUPABASE_SERVICE_ROLE_KEY es obligatorio'),
     SUPABASE_ANON_KEY: z.string().min(1, 'SUPABASE_ANON_KEY es obligatorio'),

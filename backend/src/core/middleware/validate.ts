@@ -21,7 +21,6 @@ export const validate =
             // Para query y params, intentamos actualizar las propiedades individuales para evitar el error de "only a getter"
             if (data.query) {
                 try {
-                    // Si req.query es un objeto mutable, lo actualizamos
                     Object.assign(req.query, data.query);
                 } catch (_e) {
                     // Fallback para Express 5 si la propiedad es estrictamente de solo lectura
@@ -40,7 +39,6 @@ export const validate =
             return next();
         }
 
-        // Si la validación falla
         const errorDetails = result.error.issues.map((e) => ({
             path: e.path.join('.'),
             message: e.message

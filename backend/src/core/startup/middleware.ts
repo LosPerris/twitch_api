@@ -11,7 +11,6 @@ import { ALLOWED_ORIGINS } from '../config/origins';
 
 registerCacheInvalidator(invalidateUserCache);
 
-// Helper: ejecuta el middleware solo si NO es un asset estático
 const skipForAssets = (
     middleware: (req: Request, res: Response, next: NextFunction) => void
 ): ((req: Request, res: Response, next: NextFunction) => void) => {
@@ -128,7 +127,6 @@ export const configureMiddleware = (app: Application) => {
         )
     );
 
-    // Permissions Policy: Restringir acceso a hardware innecesario
     app.use(
         skipForAssets((req, res, next) => {
             res.setHeader(

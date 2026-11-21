@@ -10,8 +10,6 @@ import { normalizeLanguage, formatDuration } from '../../core/utils/time';
 import { getStreamElementsWatchtime } from '../integrations/streamelements.service';
 import { fillTemplate } from './commandTemplates';
 import { timedCall, timedHandler } from '../../core/utils/timing';
-
-// --- Textos para watchtime (vía StreamElements) ---
 function getWatchtimeTexts(lang: string = 'es') {
     const l = (lang || 'es').toLowerCase().trim();
     if (l.startsWith('en')) {
@@ -81,7 +79,6 @@ export const watchtime = async (req: AuthenticatedRequest, res: Response) => {
                     }
                 }
 
-                // Llamamos a StreamElements para obtener el watchtime real en minutos
                 const [apiResult] = await timedCall('watchtime:streamElements', () =>
                     getStreamElementsWatchtime(channel, user)
                 );
@@ -98,7 +95,6 @@ export const watchtime = async (req: AuthenticatedRequest, res: Response) => {
                     timePhrase = 'sin-watchtime';
                     watchtimeText = wtTexts.notWatching(user, channel);
                 } else {
-                    // Convertir minutos a milisegundos para nuestro formateador
                     const ms = apiResult.minutes * 60 * 1000;
                     timePhrase = formatDuration(ms, lang);
                     watchtimeText = wtTexts.watching(user, channel, timePhrase);
@@ -116,7 +112,6 @@ export const watchtime = async (req: AuthenticatedRequest, res: Response) => {
                     );
                 }
 
-                // Aplicar plantilla personalizada si se proporcionó en la URL
                 const rawTemplate = safeString(req.query.template);
                 if (rawTemplate && timePhrase && timePhrase !== 'error' && timePhrase !== 'sin-watchtime') {
                     return applyWatchtimeTemplate(

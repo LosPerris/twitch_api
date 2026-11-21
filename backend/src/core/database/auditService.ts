@@ -23,13 +23,6 @@ export const addSystemLog = async (
         console.error('Failed to log to Supabase:', _e);
     }
 };
-
-
-
-// ==========================================
-// Log de Auditoría (Acciones Sensibles)
-// ==========================================
-
 export type AuditAction =
     | 'session_login'
     | 'session_logout'

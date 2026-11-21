@@ -88,7 +88,6 @@ export function VerifyingSessionModal({ open, done = false, onExited }: Verifyin
         setProgressPercent((prev) => (prev === pct ? prev : pct));
     });
 
-    // Always call hooks before any early return (Rules of Hooks)
     const { t } = useTranslation();
 
     useEffect(() => {

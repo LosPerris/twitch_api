@@ -131,7 +131,6 @@ export const globalRateLimiter = async (req: Request, res: Response, next: NextF
         const userId = (req as AuthenticatedRequest).userId;
         const isApiKeyRequest = res.locals?.isApiKeyRequest;
 
-        // Determinar el identificador único (Key) y el límite
         let key = '';
         let limit = 0;
 

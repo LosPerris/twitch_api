@@ -17,7 +17,7 @@ export const DEFAULT_ELIGIBILITY_FILTERS: EligibilityFilters = {
     viewers: true
 };
 
-// eslint-disable-next-line
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- labels desde i18n
 export const ROLE_OPTIONS = (rlT: any): { key: EligibilityRole; label: string }[] => [
     { key: 'subs', label: rlT.roles.subs },
     { key: 'mods', label: rlT.roles.mods },
@@ -89,8 +89,7 @@ export function filtersToApiParam(filters: EligibilityFilters): string {
     return parts.length > 0 ? parts.join(',') : 'all';
 }
 
-/** Texto del botón del selector de elegibilidad */
-// eslint-disable-next-line
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- labels desde i18n
 export function filtersSummaryLabel(filters: EligibilityFilters, rlT: any): string {
     if (isAllFilters(filters)) return rlT.all;
     if (!hasAnyFilter(filters)) return rlT.none;

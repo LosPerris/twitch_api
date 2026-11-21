@@ -13,5 +13,4 @@ export * from './activityService';
 export * from './statsService';
 export * from './userService';
 export * from './userDiscordService';
-// Admin removed
 export { supabase } from './supabaseClient';

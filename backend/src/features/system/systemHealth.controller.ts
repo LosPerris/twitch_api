@@ -76,8 +76,6 @@ export const getHealth = async (req: AuthenticatedRequest, res: Response) => {
         const twitchStatus = twitchResult.status as 'online' | 'offline';
 
         const isOperational = dbStatus === 'online' && redisStatus === 'online';
-
-        // --- 4. Métricas de Sistema ---
         const memoryUsage = process.memoryUsage();
 
         const httpStatus = isOperational ? 200 : 503;

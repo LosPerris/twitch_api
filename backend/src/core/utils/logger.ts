@@ -31,7 +31,6 @@ export function clearRequestId(): void {
     asyncContext.getStore()?.delete('requestId');
 }
 
-// Formato para desarrollo: legible y coloreado
 const devFormat = printf(({ level, message, timestamp, stack, requestId, ...metadata }) => {
     let msg = `${timestamp} [${level}]`;
     if (requestId) msg += ` {${requestId}}`;
@@ -43,7 +42,6 @@ const devFormat = printf(({ level, message, timestamp, stack, requestId, ...meta
     return msg;
 });
 
-// Formato para producción: JSON estructurado
 const prodFormat = combine(
     timestamp({ format: 'YYYY-MM-DDTHH:mm:ss.SSSZ' }),
     errors({ stack: true }),
@@ -53,7 +51,6 @@ const prodFormat = combine(
     })
 );
 
-// Transporte personalizado para guardar en la base de datos (Supabase)
 class DatabaseTransport extends Transport {
     private consecutiveFailures = 0;
     private pausedUntil = 0;
@@ -73,7 +70,6 @@ class DatabaseTransport extends Transport {
                 return;
             }
 
-            // Estructurar el log para la base de datos
             const logEntry = {
                 message,
                 details: sanitizeLogValue(details) as Record<string, unknown>,
@@ -107,7 +103,6 @@ class DatabaseTransport extends Transport {
     }
 }
 
-// Determinar nivel de log según entorno
 const getLogLevel = (): string => {
     const envLevel = process.env.LOG_LEVEL;
     if (envLevel && ['error', 'warn', 'info', 'debug'].includes(envLevel)) {
@@ -116,7 +111,6 @@ const getLogLevel = (): string => {
     return process.env.NODE_ENV === 'production' ? 'info' : 'debug';
 };
 
-// Crear el logger de Winston con formato según entorno
 const isProduction = process.env.NODE_ENV === 'production';
 const isVercel = process.env.VERCEL === '1';
 
@@ -149,19 +143,15 @@ const winstonLogger = winston.createLogger({
     ]
 });
 
-// Función helper para enriquecer logs con metadata
 const enrichLog = (level: string, msg: string, args: unknown[]): Record<string, unknown> => {
     const meta: Record<string, unknown> = {};
 
-    // Agregar requestId si existe en el contexto
     const requestId = getRequestId();
     if (requestId) {
         meta.requestId = requestId;
     }
 
-    // Procesar argumentos
     if (args.length > 0) {
-        // Si el primer argumento es un objeto, extraer metadata
         if (typeof args[0] === 'object' && args[0] !== null) {
             const firstArg = sanitizeLogValue(args[0]) as Record<string, unknown>;
 
@@ -185,7 +175,6 @@ const enrichLog = (level: string, msg: string, args: unknown[]): Record<string, 
                 meta.statusCode = firstArg.statusCode;
             }
 
-            // El resto va a details
             if (Object.keys(firstArg).length > 0) {
                 meta.details = firstArg;
             }
@@ -197,43 +186,27 @@ const enrichLog = (level: string, msg: string, args: unknown[]): Record<string, 
     return meta;
 };
 
-// Interfaz mejorada del logger con soporte para estructurado
 export const logger = {
-    /**
-     * Log nivel debug - solo en desarrollo
-     */
     debug: (msg: string, ...args: unknown[]) => {
         const meta = enrichLog('debug', msg, args);
         winstonLogger.debug(msg, meta);
     },
 
-    /**
-     * Log nivel info - información general
-     */
     info: (msg: string, ...args: unknown[]) => {
         const meta = enrichLog('info', msg, args);
         winstonLogger.info(msg, meta);
     },
 
-    /**
-     * Log nivel warn - advertencias
-     */
     warn: (msg: string, ...args: unknown[]) => {
         const meta = enrichLog('warn', msg, args);
         winstonLogger.warn(msg, meta);
     },
 
-    /**
-     * Log nivel error - errores
-     */
     error: (msg: string, ...args: unknown[]) => {
         const meta = enrichLog('error', msg, args);
         winstonLogger.error(msg, meta);
     },
 
-    /**
-     * Log de inicio de request con correlación
-     */
     startRequest: (method: string, url: string, userId?: string, suppliedRequestId?: string) => {
         const requestId = suppliedRequestId || generateRequestId();
         setRequestId(requestId);

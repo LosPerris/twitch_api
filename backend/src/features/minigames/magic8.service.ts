@@ -108,15 +108,13 @@ export async function generateMagic8Response(
 
         const result = finalContent.length > 390 ? finalContent.substring(0, 387) + '...' : finalContent;
 
-        // Limpiar caché si crece mucho
         if (responseCache.size > 100) {
             const now = Date.now();
             for (const [key, val] of responseCache.entries()) {
                 if (val.expiry <= now) responseCache.delete(key);
             }
         }
-        
-        // Guardar en caché
+
         responseCache.set(cacheKey, { content: result, expiry: Date.now() + CACHE_TTL_MS });
 
         return result;

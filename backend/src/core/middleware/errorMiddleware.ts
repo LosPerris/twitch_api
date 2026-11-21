@@ -22,7 +22,6 @@ export const errorHandler = async (
     res: Response,
     _next: NextFunction
 ) => {
-    // Agregar requestId al error si existe
     const requestId = getRequestId();
     if (requestId) {
         err.requestId = requestId;

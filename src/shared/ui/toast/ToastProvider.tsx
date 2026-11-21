@@ -40,8 +40,7 @@ export function promoteToasterAboveModals(): void {
     }
 }
 
-// AppToaster ya no hace falta porque lo renderizamos en ToastProvider. 
-// Dejamos un wrapper vacío para que no rompa el JSX donde está importado (DashboardApp.tsx).
+/** Compat: DashboardApp aún importa AppToaster; el toast vive en ToastProvider. */
 export function AppToaster() {
     return null;
 }
@@ -71,9 +70,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     const dismissToast = (id?: ToastId) => {
         if (id !== undefined) {
             baseDismissToast(String(id));
-        } else {
-            // Dismiss all is not supported by base API unless we clear, let's ignore if no id provided
-            // or we could add clearToasts. For now just do nothing.
         }
     };
 

@@ -26,7 +26,7 @@ export interface Clip {
 
 export const ITEMS_PER_PAGE = 20;
 
-// eslint-disable-next-line
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- opciones de sort tipadas vía i18n
 const getClipsSortOptions = (t: any) => [
     { value: 'date-desc', label: t.clips.sort.dateDesc },
     { value: 'date-asc', label: t.clips.sort.dateAsc },
@@ -133,7 +133,7 @@ export function useClips({ active = true }: { active?: boolean } = {}) {
                 }
             }
         },
-        // eslint-disable-next-line
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- loadClips estable respecto a toasts
         [session, showToast]
     );
 

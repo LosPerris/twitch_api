@@ -132,7 +132,6 @@ export function resolveWheelPalette(colorInput?: string): WheelPalette {
         };
     }
 
-    // Custom HEX or color string (e.g. #ff007f)
     const baseHue = hexToHue(mode);
     return {
         primaryHex: mode.startsWith('#') ? mode : `hsl(${baseHue}, 100%, 50%)`,

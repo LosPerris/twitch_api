@@ -56,8 +56,6 @@ export const timedHandler = async (
         console.log(`[timing] HANDLER ${name}: ${ms}ms total  ${req.method} ${req.originalUrl?.split('?')[0]}`);
     }
 };
-
-// --- Cold-start ---
 const MODULE_LOAD_TIME = performance.now();
 let coldStartLogged = false;
 

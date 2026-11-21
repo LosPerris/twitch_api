@@ -83,7 +83,6 @@ export function Sheet({ open, onClose, title, titleBadge, description, children,
         panel.addEventListener('animationend', onEnd);
     }, [onClose, closing]);
 
-    // Handle escape key
     useEffect(() => {
         const dialog = dialogRef.current;
         if (!dialog) return;
