@@ -7,9 +7,7 @@ import type { RealtimeCallbacks, RealtimeSubscribeOptions, SubscriberEntry } fro
 import { isRealtimeInCooldown, markRealtimeCooldown } from '../../../../core/realtime/cooldown';
 import { waitForStablePage, isPageUnloading } from '../../../../core/realtime/errors';
 
-export { isRealtimeInCooldown } from '../../../../core/realtime/cooldown';
 export type { RealtimeCallbacks } from './types';
-export { RealtimeService }; // For any other imports
 
 let realtimeServiceInstance: RealtimeService | null = null;
 let activeSessionKey: string | null = null;
