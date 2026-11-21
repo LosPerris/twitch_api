@@ -4,6 +4,8 @@ landing: {
         nav: {
             sectionsAria: 'Secciones',
             product: 'Producto',
+            faq: 'FAQ',
+            resources: 'Recursos',
             docs: 'Docs',
             discord: 'Discord'
         },
@@ -15,6 +17,8 @@ landing: {
             panelAria: 'Panel de control'
         },
         resources: {
+            title: 'Docs y comunidad',
+            subtitle: 'Guías oficiales y un Discord donde resolver dudas con otros streamers.',
             docsTitle: 'Documentación Oficial',
             docsText:
                 'Guías paso a paso, variables para comandos y tutoriales detallados para que configures tu panel y tus integraciones en minutos.',
@@ -137,7 +141,7 @@ landing: {
         },
         faq: {
             title: 'Preguntas frecuentes',
-            subtitle: 'Gratis, bots y OBS. Lo que preguntan antes de conectar.',
+            subtitle: 'Gratis, bots, Bits, alertas y OBS. Lo que preguntan antes de conectar.',
             items: {
                 gratis: {
                     title: '¿Es gratis?',
@@ -151,22 +155,22 @@ landing: {
                     title: '¿Cómo empiezo?',
                     content: 'Conectas Twitch, eliges el comando u overlay y lo pegas en el bot o en OBS. En un minuto está listo.'
                 },
-                permisos: {
-                    title: '¿Qué permisos pide Twitch?',
-                    content: 'Solo los necesarios para identificar tu canal y generar los comandos. No publicamos en tu chat ni cambiamos el stream.'
+                bits: {
+                    title: '¿Qué pasa con los Bits?',
+                    content:
+                        'Configuras un umbral y una reacción: ruleta, mensaje o imagen por URL pública. El overlay en OBS responde cuando llega el cheer.'
+                },
+                alertas: {
+                    title: '¿Hay alertas de follow, sub y raid?',
+                    content:
+                        'Sí. Activas follow, suscripciones o raids y eliges mensaje o imagen. Se conectan por EventSub sin otro programa.'
                 },
                 obs: {
                     title: '¿Puedo usarlo en OBS?',
-                    content: 'Sí. Tendencias, ruleta, preguntas y otras herramientas tienen overlay: copias la URL y la pegas como fuente de navegador.'
+                    content:
+                        'Sí. Tendencias, ruleta, preguntas, Bits y más tienen overlay: copias la URL y la pegas como fuente de navegador.'
                 }
             }
-        },
-        users: {
-            title: 'Streamers que utilizan la API',
-            subtitle: 'Únete a los streamers que ya confían en la API para sus directos.',
-            noDescription: 'Sin descripción en Twitch.',
-            loadingAria: 'Cargando pioneros',
-            twitchChannelAria: (name: string): string => `Canal de Twitch de ${name}`
         }
     }
 };

@@ -4,6 +4,8 @@ landing: {
         nav: {
             sectionsAria: 'Sections',
             product: 'Product',
+            faq: 'FAQ',
+            resources: 'Resources',
             docs: 'Docs',
             discord: 'Discord'
         },
@@ -15,6 +17,8 @@ landing: {
             panelAria: 'Control panel'
         },
         resources: {
+            title: 'Docs and community',
+            subtitle: 'Official guides and a Discord where you can get help from other streamers.',
             docsTitle: 'Official documentation',
             docsText:
                 'Step-by-step guides, command variables, and detailed tutorials so you can set up your panel and integrations in minutes.',
@@ -137,7 +141,7 @@ landing: {
         },
         faq: {
             title: 'Frequently asked questions',
-            subtitle: 'Free, bots, and OBS. What people ask before connecting.',
+            subtitle: 'Free, bots, Bits, alerts, and OBS. What people ask before connecting.',
             items: {
                 gratis: {
                     title: 'Is it free?',
@@ -151,22 +155,22 @@ landing: {
                     title: 'How do I start?',
                     content: 'Connect Twitch, pick a command or overlay, and paste it into your bot or OBS. Ready in about a minute.'
                 },
-                permisos: {
-                    title: 'What Twitch permissions does it ask for?',
-                    content: 'Only what is needed to identify your channel and generate commands. We do not post to your chat or change the stream.'
+                bits: {
+                    title: 'What about Bits?',
+                    content:
+                        'Set a threshold and a reaction: roulette, message, or image from a public URL. The OBS overlay responds when the cheer lands.'
+                },
+                alertas: {
+                    title: 'Are there follow, sub, and raid alerts?',
+                    content:
+                        'Yes. Turn on follows, subscriptions, or raids and choose message or image. They connect via EventSub with no extra app.'
                 },
                 obs: {
                     title: 'Can I use it in OBS?',
-                    content: 'Yes. Trends, roulette, questions, and other tools have overlays: copy the URL and add it as a browser source.'
+                    content:
+                        'Yes. Trends, roulette, questions, Bits, and more have overlays: copy the URL and add it as a browser source.'
                 }
             }
-        },
-        users: {
-            title: 'Streamers using the API',
-            subtitle: 'Join streamers who already trust the API on their streams.',
-            noDescription: 'No Twitch description.',
-            loadingAria: 'Loading pioneers',
-            twitchChannelAria: (name: string): string => `${name}'s Twitch channel`
         }
     }
 };

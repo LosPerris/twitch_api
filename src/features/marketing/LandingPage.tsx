@@ -5,7 +5,6 @@ import { I18nProvider, useTranslation } from '@/core/i18n/I18nContext';
 import { reportSessionLoadProgress } from '@/core/session/loadProgress';
 import { LandingHeader } from './sections/LandingHeader';
 import { LandingHero } from './sections/LandingHero';
-import { LandingUsers } from './sections/LandingUsers';
 import { LandingFeatures } from './sections/LandingFeatures';
 import { LandingFit } from './sections/LandingFit';
 import { LandingFaq } from './sections/LandingFaq';
@@ -153,9 +152,8 @@ function LandingPageInner() {
                 <LandingHero legacyReloginNotice={legacyReloginNotice} onLoginClick={openLogin} />
                 <LandingFeatures />
                 <LandingFit />
-                <LandingUsers />
-                <LandingResources />
                 <LandingFaq />
+                <LandingResources />
             </div>
 
             <Suspense fallback={null}>

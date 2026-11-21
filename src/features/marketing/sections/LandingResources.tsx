@@ -9,7 +9,13 @@ export function LandingResources() {
     const r = t.landing.resources;
 
     return (
-        <section id="recursos" className="relative overflow-hidden px-5 pt-4 pb-20 md:px-8 md:pt-8 md:pb-28">
+        <section id="recursos" className="relative scroll-mt-24 overflow-hidden px-5 pt-16 pb-24 md:px-8 md:pt-24 md:pb-32">
+            <LandingReveal className="relative z-[1] mx-auto mb-10 max-w-[640px] text-center md:mb-12">
+                <h2 className="text-3xl font-semibold tracking-tight text-text-main md:text-[2.25rem] md:leading-tight">
+                    {r.title}
+                </h2>
+                <p className="mt-3 text-base leading-relaxed text-text-muted md:text-lg">{r.subtitle}</p>
+            </LandingReveal>
             <LandingReveal className="relative z-[1] mx-auto max-w-[1080px]">
                 <div className="grid gap-6 md:grid-cols-2">
                     <a

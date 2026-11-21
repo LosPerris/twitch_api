@@ -1,8 +1,6 @@
 import { AppLogo } from '@/shared/ui/AppLogo';
-import { DiscordIcon } from '@/shared/ui/icons/BrandIcons';
-import { appPath, saveDocsReturnPath } from '@/core/config/paths';
+import { appPath } from '@/core/config/paths';
 import { useTranslation } from '@/core/i18n/I18nContext';
-import { DISCORD_COMMUNITY_URL } from '../lib/landingContent';
 import { LandingAuthCta } from '../sections/LandingAuthCta';
 
 const navLink =
@@ -40,31 +38,17 @@ export function LandingHeader({ scrolled, onLoginClick }: LandingHeaderProps) {
                     <a href="#producto" className={navLink}>
                         {nav.product}
                     </a>
-                    <a href={appPath('/docs')} onClick={saveDocsReturnPath} className={navLink}>
-                        {nav.docs}
+                    <a href="#faq" className={navLink}>
+                        {nav.faq}
                     </a>
-                    <a
-                        href={DISCORD_COMMUNITY_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={navLink}
-                    >
-                        {nav.discord}
+                    <a href="#recursos" className={navLink}>
+                        {nav.resources}
                     </a>
                 </nav>
 
                 <div className="ml-auto flex shrink-0 items-center justify-end gap-1">
-                    <a href={appPath('/docs')} onClick={saveDocsReturnPath} className={`${navLink} md:hidden`}>
-                        {nav.docs}
-                    </a>
-                    <a
-                        href={DISCORD_COMMUNITY_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`${navLink} inline-flex items-center md:hidden`}
-                        aria-label={nav.discord}
-                    >
-                        <DiscordIcon className="h-4 w-4" />
+                    <a href="#faq" className={`${navLink} md:hidden`}>
+                        {nav.faq}
                     </a>
                     <LandingAuthCta variant="header" onLoginClick={onLoginClick} />
                 </div>

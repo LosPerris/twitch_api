@@ -17,6 +17,7 @@ coverage/
 # Notas 
 /docs/
 legal-edit-draft.md
+FUTUROS.md
 # Borradores 
 /scripts/supabase/
 /backend/migrations/*.sql

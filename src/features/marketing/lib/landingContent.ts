@@ -72,6 +72,7 @@ export const FAQ_ITEMS = [
     { id: 'gratis' as const },
     { id: 'bots' as const },
     { id: 'empezar' as const },
-    { id: 'permisos' as const },
+    { id: 'bits' as const },
+    { id: 'alertas' as const },
     { id: 'obs' as const }
 ];

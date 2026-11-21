@@ -2,10 +2,13 @@ import { Fragment } from 'react';
 import { legalPath } from '@/core/config/paths';
 import { APP_BOTTOM_BAR, sidebarFooterOffset } from '@/core/utils/tw';
 
+const GITHUB_REPO_URL = 'https://github.com/LosPerris/twitch_api';
+
 const LEGAL_LINKS = [
     { href: legalPath('terminos'), label: 'Términos' },
     { href: legalPath('privacidad'), label: 'Privacidad' },
-    { href: '/docs', label: 'API Docs' }
+    { href: '/docs', label: 'API Docs' },
+    { href: GITHUB_REPO_URL, label: 'GitHub', external: true }
 ] as const;
 
 interface FooterProps {
@@ -51,6 +54,9 @@ export function Footer({ isDashboard = false }: FooterProps) {
                             <a
                                 href={link.href}
                                 className="font-medium text-text-muted transition-colors hover:text-text-main"
+                                {...('external' in link && link.external
+                                    ? { target: '_blank', rel: 'noopener noreferrer' }
+                                    : {})}
                             >
                                 {link.label}
                             </a>
