@@ -30,6 +30,7 @@
         "audit:ci": "pnpm audit --audit-level=high --ignore-registry-errors",
         "prepare": "husky",
         "smoke": "node scripts/smoke-production.mjs",
+        "canary": "node scripts/canary-production.mjs",
         "verify:migrations": "node scripts/verify-migrations.mjs",
         "backfill:api-keys": "tsx -r dotenv/config scripts/backfill-api-key-encryption.ts",
         "test:watch": "jest --config jest.config.js --watch",
