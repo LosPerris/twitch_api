@@ -9,7 +9,8 @@ describe('overlaySetupGuide', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const gT: any = {
         sizes: {
-            trends: (w: number, h: number) => `${w} × ${h}`
+            trends: (w: number, h: number) => `${w} × ${h}`,
+            'bits-roulette': (w: number, h: number) => `${w} × ${h}`
         },
         obsTitle: 'OBS',
         slTitle: 'Streamlabs',
@@ -69,6 +70,18 @@ describe('overlaySetupGuide', () => {
     });
 
     it('expone la versión del setup', () => {
-        expect(OVERLAY_SETUP_VERSION).toBe('1.5');
+        expect(OVERLAY_SETUP_VERSION).toBe('1.6');
+    });
+
+    it('adapta el tamaño OBS de Bits según el modo de reacción', () => {
+        const roulette = resolveOverlayBrowserSize('bits-roulette', 'md', 'roulette');
+        const message = resolveOverlayBrowserSize('bits-roulette', 'md', 'message');
+        const image = resolveOverlayBrowserSize('bits-roulette', 'md', 'image');
+        expect(roulette).toEqual({ width: 720, height: 720 });
+        expect(message).toEqual({ width: 920, height: 280 });
+        expect(image).toEqual({ width: 900, height: 640 });
+
+        const guide = getOverlayPlatformGuide('bits-roulette', 'obs', gT, 'md', 'message');
+        expect(guide.steps.some((step) => step.detail.includes('920 × 280'))).toBe(true);
     });
 });

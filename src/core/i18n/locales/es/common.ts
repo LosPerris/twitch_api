@@ -19,9 +19,9 @@ header: {
             slots: 'Tragamonedas sencilla para el chat',
             questions: 'Recoge y gestiona preguntas del chat',
             bitsRoulette: 'Reacciones cuando recibes bits',
-            alertFollow: 'Anuncios cuando alguien te sigue',
-            alertSub: 'Anuncios en nuevas suscripciones',
-            alertRaid: 'Anuncios cuando recibes raids',
+            alertFollow: 'En construcción — alertas de follows',
+            alertSub: 'En construcción — alertas de suscripciones',
+            alertRaid: 'En construcción — alertas de raids',
             feedback: 'Envíanos sugerencias o reporta errores',
             default: 'Panel de Control'
         },

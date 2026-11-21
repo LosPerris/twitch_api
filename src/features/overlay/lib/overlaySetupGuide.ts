@@ -1,5 +1,6 @@
 import type { OverlayTool } from '@/features/overlay/lib/types';
 import type { Translations } from '@/core/i18n/locales/es';
+import type { BitsReactionMode } from '@/features/alerts/lib/bitsRouletteUrl';
 import {
     OVERLAY_SCALE_VALUES,
     type OverlayScaleId
@@ -7,7 +8,7 @@ import {
 
 export type OverlayPlatform = 'obs' | 'streamlabs';
 
-export const OVERLAY_SETUP_VERSION = '1.5';
+export const OVERLAY_SETUP_VERSION = '1.6';
 
 /** Tamaño base del Browser Source (scale `md` = 1×). */
 export const OVERLAY_OBS_BASE_SIZE: Record<OverlayTool, { width: number; height: number }> = {
@@ -17,11 +18,25 @@ export const OVERLAY_OBS_BASE_SIZE: Record<OverlayTool, { width: number; height:
     'bits-roulette': { width: 720, height: 720 }
 };
 
+/** Bits: el lienzo OBS cambia según la reacción del panel. */
+export const BITS_OVERLAY_BASE_SIZE: Record<
+    BitsReactionMode,
+    { width: number; height: number }
+> = {
+    roulette: { width: 720, height: 720 },
+    message: { width: 920, height: 280 },
+    image: { width: 900, height: 640 }
+};
+
 export function resolveOverlayBrowserSize(
     tool: OverlayTool,
-    scale: OverlayScaleId = 'md'
+    scale: OverlayScaleId = 'md',
+    bitsMode: BitsReactionMode = 'roulette'
 ): { width: number; height: number } {
-    const base = OVERLAY_OBS_BASE_SIZE[tool];
+    const base =
+        tool === 'bits-roulette'
+            ? BITS_OVERLAY_BASE_SIZE[bitsMode] || BITS_OVERLAY_BASE_SIZE.roulette
+            : OVERLAY_OBS_BASE_SIZE[tool];
     const factor = OVERLAY_SCALE_VALUES[scale];
     return {
         width: Math.round(base.width * factor),
@@ -61,9 +76,10 @@ export function getOverlayPlatformGuide(
     tool: OverlayTool,
     platform: OverlayPlatform,
     gT: Translations['overlay']['guide'],
-    scale: OverlayScaleId = 'md'
+    scale: OverlayScaleId = 'md',
+    bitsMode: BitsReactionMode = 'roulette'
 ): OverlayPlatformGuide {
-    const { width, height } = resolveOverlayBrowserSize(tool, scale);
+    const { width, height } = resolveOverlayBrowserSize(tool, scale, bitsMode);
     const size = gT.sizes[tool](width, height);
 
     if (platform === 'obs') {

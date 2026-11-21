@@ -19,9 +19,9 @@ header: {
             slots: 'Caça-níqueis simples para o chat',
             questions: 'Colete e gerencie perguntas do chat',
             bitsRoulette: 'Reações quando você recebe bits',
-            alertFollow: 'Anúncios quando alguém seguir você',
-            alertSub: 'Anúncios em novas inscrições',
-            alertRaid: 'Anúncios em raids',
+            alertFollow: 'Em construção — alertas de follows',
+            alertSub: 'Em construção — alertas de assinaturas',
+            alertRaid: 'Em construção — alertas de raids',
             feedback: 'Envie sugestões ou reporte bugs',
             default: 'Painel'
         },

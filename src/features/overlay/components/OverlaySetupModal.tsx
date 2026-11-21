@@ -90,11 +90,18 @@ export function OverlaySetupModal({ open, onClose, tool }: OverlaySetupModalProp
     );
     const spinBannerInputRef = useRef<HTMLInputElement>(null);
 
+    const bitsMode = bitsConfig.reactionMode;
     const guide = useMemo(
-        () => getOverlayPlatformGuide(tool, platform, gT, obsScale),
-        [tool, platform, gT, obsScale]
+        () => getOverlayPlatformGuide(tool, platform, gT, obsScale, bitsMode),
+        [tool, platform, gT, obsScale, bitsMode]
     );
     const toolLabel = gT.tools[tool] ?? tool;
+    const bitsModeLabel =
+        bitsMode === 'message'
+            ? bitsT.reactionModeMessage
+            : bitsMode === 'image'
+              ? bitsT.reactionModeImage
+              : bitsT.reactionModeRoulette;
 
     const handleColorChange = (newColor: string) => {
         setObsWheelColor(newColor);
@@ -262,8 +269,8 @@ export function OverlaySetupModal({ open, onClose, tool }: OverlaySetupModalProp
                     </div>
                     <p className="mb-3 text-[0.7rem] leading-relaxed text-text-muted">{aT.desc}</p>
 
-                    <p className="mb-2 text-[0.7rem] font-semibold text-text-muted">{aT.colorLabel}</p>
-                    <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    <p className="mb-1.5 text-[0.7rem] font-semibold text-text-muted">{aT.colorLabel}</p>
+                    <div className="grid grid-cols-3 gap-1.5">
                         {ROULETTE_COLOR_PRESETS.map((preset) => {
                             const isSelected = obsWheelColor === preset.id;
                             const palette = resolveWheelPalette(preset.id);
@@ -273,51 +280,52 @@ export function OverlaySetupModal({ open, onClose, tool }: OverlaySetupModalProp
                                     type="button"
                                     onClick={() => handleColorChange(preset.id)}
                                     title={preset.label}
-                                    className={`group relative flex items-center gap-2 overflow-hidden rounded-lg px-2.5 py-2 text-left text-[0.7rem] font-medium ${
+                                    className={`flex items-center gap-1.5 overflow-hidden rounded-md px-2 py-1.5 text-left text-[0.65rem] font-medium ${
                                         isSelected ? themeActiveChoice : themeIdleChoice
                                     }`}
                                 >
                                     <span
-                                        className="size-3.5 shrink-0 rounded-full border border-white/20"
-                                        style={{ backgroundColor: preset.isAuto ? 'var(--primary)' : palette.primaryHex }}
+                                        className="size-3 shrink-0 rounded-full border border-white/20"
+                                        style={{
+                                            backgroundColor: preset.isAuto
+                                                ? 'var(--primary)'
+                                                : palette.primaryHex
+                                        }}
                                     />
-                                    <span className="min-w-0 flex-1 overflow-hidden whitespace-nowrap">
-                                        <span className="inline-block whitespace-nowrap transition-transform duration-700 ease-out group-hover:-translate-x-1/3">
-                                            {preset.label}
-                                        </span>
-                                    </span>
+                                    <span className="min-w-0 truncate">{preset.label}</span>
                                 </button>
                             );
                         })}
                     </div>
 
-                    <div className="mt-3 flex items-center justify-between gap-3 rounded-lg border border-border-subtle bg-bg-secondary px-3 py-2">
-                        <span className="text-[0.7rem] text-text-muted">{aT.customColor}</span>
+                    <div className="mt-2 flex items-center justify-between gap-3 rounded-lg border border-border-subtle bg-bg-secondary px-2.5 py-1.5">
+                        <span className="text-[0.65rem] text-text-muted">{aT.customColor}</span>
                         <div className="flex items-center gap-2">
                             <input
                                 type="color"
                                 aria-label={aT.customColor}
                                 value={obsWheelColor.startsWith('#') ? obsWheelColor : '#9146ff'}
                                 onChange={(e) => handleColorChange(e.target.value)}
-                                className="size-6 cursor-pointer rounded border-0 bg-transparent p-0"
+                                className="size-5 cursor-pointer rounded border-0 bg-transparent p-0"
                             />
-                            <span className="font-mono text-[0.7rem] uppercase text-text-main">
+                            <span className="font-mono text-[0.65rem] uppercase text-text-main">
                                 {obsWheelColor.startsWith('#') ? obsWheelColor : aT.preset}
                             </span>
                         </div>
                     </div>
 
-                    <p className="mt-4 mb-2 text-[0.7rem] font-semibold text-text-muted">{aT.scaleLabel}</p>
-                    <div className="grid grid-cols-3 gap-2">
+                    <p className="mt-3 mb-1.5 text-[0.7rem] font-semibold text-text-muted">{aT.scaleLabel}</p>
+                    <div className="grid grid-cols-3 gap-1.5">
                         {(['sm', 'md', 'lg'] as const).map((id) => {
                             const selected = obsScale === id;
-                            const label = id === 'sm' ? aT.scaleSm : id === 'lg' ? aT.scaleLg : aT.scaleMd;
+                            const label =
+                                id === 'sm' ? aT.scaleSm : id === 'lg' ? aT.scaleLg : aT.scaleMd;
                             return (
                                 <button
                                     key={id}
                                     type="button"
                                     onClick={() => handleScaleChange(id)}
-                                    className={`rounded-lg px-2 py-2 text-[0.7rem] font-medium ${
+                                    className={`rounded-md px-2 py-1.5 text-[0.65rem] font-medium ${
                                         selected ? themeActiveChoice : themeIdleChoice
                                     }`}
                                 >
@@ -329,187 +337,370 @@ export function OverlaySetupModal({ open, onClose, tool }: OverlaySetupModalProp
 
                     {tool === 'bits-roulette' ? (
                         <div className="mt-4 space-y-3 border-t border-border-subtle pt-4">
-                            <p className="text-[0.7rem] font-semibold text-text-muted">
-                                {bitsT.appearanceTitle}
-                            </p>
-                            <div className="grid gap-2 sm:grid-cols-2">
-                                <div className="flex items-center gap-2 text-[0.75rem] text-text-main">
-                                    <input
-                                        type="checkbox"
-                                        checked={Boolean(bitsConfig.spinBanner)}
-                                        onChange={(e) =>
-                                            updateBits({
-                                                spinBanner: e.target.checked
-                                                    ? normalizeSpinBanner(
-                                                          bitsConfig.spinBanner ||
-                                                              bitsT.spinBannerDefault ||
-                                                              DEFAULT_BITS_SPIN_BANNER
-                                                      )
-                                                    : ''
-                                            })
-                                        }
-                                        aria-label={bitsT.spinBanner}
-                                        className="size-3.5 shrink-0 accent-primary"
-                                    />
-                                    <span className="select-none">{bitsT.spinBanner}</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-[0.75rem] text-text-main">
-                                    <input
-                                        type="checkbox"
-                                        checked={bitsConfig.showDonor}
-                                        onChange={(e) =>
-                                            updateBits({ showDonor: e.target.checked })
-                                        }
-                                        aria-label={bitsT.showDonor}
-                                        className="size-3.5 shrink-0 accent-primary"
-                                    />
-                                    <span className="select-none">{bitsT.showDonor}</span>
-                                </div>
-                                <div className="flex items-center gap-2 text-[0.75rem] text-text-main sm:col-span-2">
-                                    <input
-                                        type="checkbox"
-                                        checked={bitsConfig.confetti}
-                                        onChange={(e) => {
-                                            const on = e.target.checked;
-                                            updateBits({
-                                                confetti: on,
-                                                ...(on && bitsConfig.confettiSound === 'none'
-                                                    ? { confettiSound: 'confetti' as const }
-                                                    : {})
-                                            });
-                                        }}
-                                        aria-label={bitsT.confetti}
-                                        className="size-3.5 shrink-0 accent-primary"
-                                    />
-                                    <span className="select-none">{bitsT.confetti}</span>
-                                </div>
+                            <div className="flex items-center justify-between gap-2">
+                                <p className="text-[0.7rem] font-semibold text-text-muted">
+                                    {bitsMode === 'message'
+                                        ? aT.bitsMessageTitle
+                                        : bitsMode === 'image'
+                                          ? aT.bitsImageTitle
+                                          : aT.bitsRouletteTitle}
+                                </p>
+                                <span className="rounded-md border border-primary/25 bg-primary/10 px-2 py-0.5 text-[0.65rem] font-semibold text-primary">
+                                    {bitsModeLabel}
+                                </span>
                             </div>
-                            {bitsConfig.spinBanner ? (
-                                <div className="space-y-1">
+                            <p className="text-[0.65rem] leading-snug text-text-muted">
+                                {bitsMode === 'message'
+                                    ? aT.bitsMessageHint
+                                    : bitsMode === 'image'
+                                      ? aT.bitsImageHint
+                                      : aT.bitsRouletteHint}
+                            </p>
+
+                            {bitsMode === 'roulette' ? (
+                                <>
+                                    <div className="grid gap-2">
+                                        <div className="flex items-center gap-2 text-[0.75rem] text-text-main">
+                                            <input
+                                                type="checkbox"
+                                                checked={Boolean(bitsConfig.spinBanner)}
+                                                onChange={(e) =>
+                                                    updateBits({
+                                                        spinBanner: e.target.checked
+                                                            ? normalizeSpinBanner(
+                                                                  bitsConfig.spinBanner ||
+                                                                      bitsT.spinBannerDefault ||
+                                                                      DEFAULT_BITS_SPIN_BANNER
+                                                              )
+                                                            : ''
+                                                    })
+                                                }
+                                                aria-label={bitsT.spinBanner}
+                                                className="size-3.5 shrink-0 accent-primary"
+                                            />
+                                            <span className="select-none">{bitsT.spinBanner}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-[0.75rem] text-text-main">
+                                            <input
+                                                type="checkbox"
+                                                checked={bitsConfig.showDonor}
+                                                onChange={(e) =>
+                                                    updateBits({ showDonor: e.target.checked })
+                                                }
+                                                aria-label={bitsT.showDonor}
+                                                className="size-3.5 shrink-0 accent-primary"
+                                            />
+                                            <span className="select-none">{bitsT.showDonor}</span>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-[0.75rem] text-text-main">
+                                            <input
+                                                type="checkbox"
+                                                checked={bitsConfig.confetti}
+                                                onChange={(e) => {
+                                                    const on = e.target.checked;
+                                                    updateBits({
+                                                        confetti: on,
+                                                        ...(on &&
+                                                        bitsConfig.confettiSound === 'none'
+                                                            ? {
+                                                                  confettiSound:
+                                                                      'confetti' as const
+                                                              }
+                                                            : {})
+                                                    });
+                                                }}
+                                                aria-label={bitsT.confetti}
+                                                className="size-3.5 shrink-0 accent-primary"
+                                            />
+                                            <span className="select-none">{bitsT.confetti}</span>
+                                        </div>
+                                    </div>
+
+                                    {bitsConfig.spinBanner ? (
+                                        <div className="space-y-1">
+                                            <label className="block text-[0.7rem] text-text-muted">
+                                                {bitsT.spinBannerText}
+                                                <input
+                                                    ref={spinBannerInputRef}
+                                                    type="text"
+                                                    value={bitsConfig.spinBanner}
+                                                    maxLength={80}
+                                                    onChange={(e) =>
+                                                        updateBits({
+                                                            spinBanner: normalizeSpinBanner(
+                                                                e.target.value
+                                                            )
+                                                        })
+                                                    }
+                                                    placeholder={
+                                                        bitsT.spinBannerDefault ||
+                                                        DEFAULT_BITS_SPIN_BANNER
+                                                    }
+                                                    className={`${toolConfigInput} mt-1`}
+                                                />
+                                            </label>
+                                            <small className="flex flex-wrap items-center gap-x-1 gap-y-1 text-[0.6875rem] leading-snug text-text-muted">
+                                                <strong className="text-text-main">
+                                                    {bitsT.spinBannerVars}
+                                                </strong>
+                                                {(['{name}', '{bits}'] as const).map((token) => (
+                                                    <button
+                                                        key={token}
+                                                        type="button"
+                                                        onClick={() => insertSpinBannerVar(token)}
+                                                        title={bitsT.spinBannerInsertVar.replace(
+                                                            '{var}',
+                                                            token
+                                                        )}
+                                                        aria-label={bitsT.spinBannerInsertVar.replace(
+                                                            '{var}',
+                                                            token
+                                                        )}
+                                                        className="rounded border border-primary/30 bg-primary/15 px-1.5 py-0.5 font-mono text-[0.75rem] font-medium text-brand-text transition-colors hover:border-primary/50 hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40"
+                                                    >
+                                                        {token}
+                                                    </button>
+                                                ))}
+                                            </small>
+                                        </div>
+                                    ) : null}
+
                                     <label className="block text-[0.7rem] text-text-muted">
-                                        {bitsT.spinBannerText}
+                                        {bitsT.confettiSound}
+                                        <div className="mt-1 flex items-center gap-2">
+                                            <div className="min-w-0 flex-1">
+                                                <SelectField
+                                                    value={bitsConfig.confettiSound}
+                                                    onChange={(e) =>
+                                                        updateBits({
+                                                            confettiSound: normalizeConfettiSound(
+                                                                e.target.value
+                                                            )
+                                                        })
+                                                    }
+                                                    aria-label={bitsT.confettiSound}
+                                                    className="!w-full !max-w-none min-w-0"
+                                                    options={BITS_CONFETTI_SOUND_IDS.map((id) => ({
+                                                        value: id,
+                                                        label: bitsT.confettiSounds[id]
+                                                    }))}
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                disabled={bitsConfig.confettiSound === 'none'}
+                                                onClick={() =>
+                                                    playBitsConfettiSound(
+                                                        bitsConfig.confettiSound
+                                                    )
+                                                }
+                                                className="shrink-0 rounded-md border border-border-subtle px-2 py-1.5 text-[0.7rem] font-medium text-text-main transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+                                            >
+                                                {bitsT.confettiSoundPreview}
+                                            </button>
+                                        </div>
+                                    </label>
+
+                                    <div className="grid gap-3 sm:grid-cols-2">
+                                        <label className="block text-[0.7rem] text-text-muted">
+                                            {bitsT.cardStyle}
+                                            <div className="mt-1">
+                                                <SelectField
+                                                    value={bitsConfig.cardStyle}
+                                                    onChange={(e) =>
+                                                        updateBits({
+                                                            cardStyle: e.target
+                                                                .value as BitsWinnerCardStyle
+                                                        })
+                                                    }
+                                                    aria-label={bitsT.cardStyle}
+                                                    className="!w-full !max-w-none min-w-0"
+                                                    options={[
+                                                        {
+                                                            value: 'glass',
+                                                            label: bitsT.cardGlass
+                                                        },
+                                                        {
+                                                            value: 'solid',
+                                                            label: bitsT.cardSolid
+                                                        }
+                                                    ]}
+                                                />
+                                            </div>
+                                        </label>
+                                        <label className="block text-[0.7rem] text-text-muted">
+                                            {bitsT.winnerHold}
+                                            <input
+                                                type="number"
+                                                min={BITS_WINNER_HOLD_MIN_SEC}
+                                                max={BITS_WINNER_HOLD_MAX_SEC}
+                                                step={1}
+                                                value={bitsConfig.winnerHoldSec}
+                                                onChange={(e) =>
+                                                    updateBits({
+                                                        winnerHoldSec: normalizeWinnerHoldSec(
+                                                            e.target.value
+                                                        )
+                                                    })
+                                                }
+                                                aria-label={bitsT.winnerHold}
+                                                className={`${toolConfigInput} mt-1 w-full`}
+                                            />
+                                        </label>
+                                    </div>
+                                </>
+                            ) : null}
+
+                            {bitsMode === 'message' ? (
+                                <div className="space-y-3">
+                                    <label className="block text-[0.7rem] text-text-muted">
+                                        {bitsT.cardStyle}
+                                        <div className="mt-1">
+                                            <SelectField
+                                                value={bitsConfig.cardStyle}
+                                                onChange={(e) =>
+                                                    updateBits({
+                                                        cardStyle: e.target
+                                                            .value as BitsWinnerCardStyle
+                                                    })
+                                                }
+                                                aria-label={bitsT.cardStyle}
+                                                className="!w-full !max-w-none min-w-0"
+                                                options={[
+                                                    { value: 'glass', label: bitsT.cardGlass },
+                                                    { value: 'solid', label: bitsT.cardSolid }
+                                                ]}
+                                            />
+                                        </div>
+                                    </label>
+                                    <div className="flex items-center gap-2 text-[0.75rem] text-text-main">
                                         <input
-                                            ref={spinBannerInputRef}
-                                            type="text"
-                                            value={bitsConfig.spinBanner}
-                                            maxLength={80}
+                                            type="checkbox"
+                                            checked={bitsConfig.showDonor}
+                                            onChange={(e) =>
+                                                updateBits({ showDonor: e.target.checked })
+                                            }
+                                            aria-label={bitsT.showDonor}
+                                            className="size-3.5 shrink-0 accent-primary"
+                                        />
+                                        <span className="select-none">{bitsT.showDonor}</span>
+                                    </div>
+                                    <label className="block text-[0.7rem] text-text-muted">
+                                        {bitsT.winnerHold}
+                                        <input
+                                            type="number"
+                                            min={BITS_WINNER_HOLD_MIN_SEC}
+                                            max={BITS_WINNER_HOLD_MAX_SEC}
+                                            step={1}
+                                            value={bitsConfig.winnerHoldSec}
                                             onChange={(e) =>
                                                 updateBits({
-                                                    spinBanner: normalizeSpinBanner(
+                                                    winnerHoldSec: normalizeWinnerHoldSec(
                                                         e.target.value
                                                     )
                                                 })
                                             }
-                                            placeholder={
-                                                bitsT.spinBannerDefault ||
-                                                DEFAULT_BITS_SPIN_BANNER
-                                            }
-                                            className={`${toolConfigInput} mt-1`}
+                                            aria-label={bitsT.winnerHold}
+                                            className={`${toolConfigInput} mt-1 w-full`}
                                         />
+                                        <span className="mt-1 block text-[0.65rem] leading-snug text-text-muted">
+                                            {bitsT.winnerHoldHint}
+                                        </span>
                                     </label>
-                                    <small className="flex flex-wrap items-center gap-x-1 gap-y-1 text-[0.6875rem] leading-snug text-text-muted">
-                                        <strong className="text-text-main">
-                                            {bitsT.spinBannerVars}
-                                        </strong>
-                                        {(['{name}', '{bits}'] as const).map((token) => (
-                                            <button
-                                                key={token}
-                                                type="button"
-                                                onClick={() => insertSpinBannerVar(token)}
-                                                title={bitsT.spinBannerInsertVar.replace(
-                                                    '{var}',
-                                                    token
-                                                )}
-                                                aria-label={bitsT.spinBannerInsertVar.replace(
-                                                    '{var}',
-                                                    token
-                                                )}
-                                                className="rounded border border-primary/30 bg-primary/15 px-1.5 py-0.5 font-mono text-[0.8125rem] font-medium text-brand-text transition-colors hover:border-primary/50 hover:bg-primary/25 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary/40"
-                                            >
-                                                {token}
-                                            </button>
-                                        ))}
-                                    </small>
                                 </div>
                             ) : null}
-                            <label className="block text-[0.7rem] text-text-muted">
-                                {bitsT.confettiSound}
-                                <div className="mt-1 flex items-center gap-2">
-                                    <div className="min-w-0 flex-1">
-                                        <SelectField
-                                            value={bitsConfig.confettiSound}
+
+                            {bitsMode === 'image' ? (
+                                <div className="space-y-3">
+                                    <label className="block text-[0.7rem] text-text-muted">
+                                        {bitsT.winnerHold}
+                                        <input
+                                            type="number"
+                                            min={BITS_WINNER_HOLD_MIN_SEC}
+                                            max={BITS_WINNER_HOLD_MAX_SEC}
+                                            step={1}
+                                            value={bitsConfig.winnerHoldSec}
                                             onChange={(e) =>
                                                 updateBits({
-                                                    confettiSound: normalizeConfettiSound(
+                                                    winnerHoldSec: normalizeWinnerHoldSec(
                                                         e.target.value
                                                     )
                                                 })
                                             }
-                                            aria-label={bitsT.confettiSound}
-                                            options={BITS_CONFETTI_SOUND_IDS.map((id) => ({
-                                                value: id,
-                                                label: bitsT.confettiSounds[id]
-                                            }))}
+                                            aria-label={bitsT.winnerHold}
+                                            className={`${toolConfigInput} mt-1 w-full`}
                                         />
-                                    </div>
-                                    <button
-                                        type="button"
-                                        disabled={bitsConfig.confettiSound === 'none'}
-                                        onClick={() =>
-                                            playBitsConfettiSound(bitsConfig.confettiSound)
-                                        }
-                                        className="shrink-0 rounded-md border border-border-subtle px-2 py-1.5 text-[0.7rem] font-medium text-text-main transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
-                                    >
-                                        {bitsT.confettiSoundPreview}
-                                    </button>
-                                </div>
-                                <span className="mt-1 block text-[0.65rem] leading-snug text-text-muted">
-                                    {bitsT.confettiSoundHint}
-                                </span>
-                            </label>
-                            <div className="grid gap-3 sm:grid-cols-2">
-                                <label className="block text-[0.7rem] text-text-muted">
-                                    {bitsT.cardStyle}
-                                    <div className="mt-1">
-                                        <SelectField
-                                            value={bitsConfig.cardStyle}
+                                        <span className="mt-1 block text-[0.65rem] leading-snug text-text-muted">
+                                            {bitsT.winnerHoldHint}
+                                        </span>
+                                    </label>
+                                    <div className="flex items-center gap-2 text-[0.75rem] text-text-main">
+                                        <input
+                                            type="checkbox"
+                                            checked={bitsConfig.showDonor}
                                             onChange={(e) =>
-                                                updateBits({
-                                                    cardStyle: e.target
-                                                        .value as BitsWinnerCardStyle
-                                                })
+                                                updateBits({ showDonor: e.target.checked })
                                             }
-                                            aria-label={bitsT.cardStyle}
-                                            options={[
-                                                { value: 'glass', label: bitsT.cardGlass },
-                                                { value: 'solid', label: bitsT.cardSolid }
-                                            ]}
+                                            aria-label={bitsT.showDonor}
+                                            className="size-3.5 shrink-0 accent-primary"
                                         />
+                                        <span className="select-none">{bitsT.showDonor}</span>
                                     </div>
-                                </label>
-                                <label className="block text-[0.7rem] text-text-muted">
-                                    {bitsT.winnerHold}
-                                    <input
-                                        type="number"
-                                        min={BITS_WINNER_HOLD_MIN_SEC}
-                                        max={BITS_WINNER_HOLD_MAX_SEC}
-                                        step={1}
-                                        value={bitsConfig.winnerHoldSec}
-                                        onChange={(e) =>
-                                            updateBits({
-                                                winnerHoldSec: normalizeWinnerHoldSec(
-                                                    e.target.value
-                                                )
-                                            })
-                                        }
-                                        aria-label={bitsT.winnerHold}
-                                        className={`${toolConfigInput} mt-1 w-full`}
-                                    />
-                                    <span className="mt-1 block text-[0.65rem] leading-snug text-text-muted">
-                                        {bitsT.winnerHoldHint}
-                                    </span>
-                                </label>
-                            </div>
+                                    <div className="flex items-center gap-2 text-[0.75rem] text-text-main">
+                                        <input
+                                            type="checkbox"
+                                            checked={bitsConfig.confetti}
+                                            onChange={(e) => {
+                                                const on = e.target.checked;
+                                                updateBits({
+                                                    confetti: on,
+                                                    ...(on && bitsConfig.confettiSound === 'none'
+                                                        ? { confettiSound: 'confetti' as const }
+                                                        : {})
+                                                });
+                                            }}
+                                            aria-label={bitsT.confetti}
+                                            className="size-3.5 shrink-0 accent-primary"
+                                        />
+                                        <span className="select-none">{bitsT.confetti}</span>
+                                    </div>
+                                    <label className="block text-[0.7rem] text-text-muted">
+                                        {bitsT.confettiSound}
+                                        <div className="mt-1 flex items-center gap-2">
+                                            <div className="min-w-0 flex-1">
+                                                <SelectField
+                                                    value={bitsConfig.confettiSound}
+                                                    onChange={(e) =>
+                                                        updateBits({
+                                                            confettiSound: normalizeConfettiSound(
+                                                                e.target.value
+                                                            )
+                                                        })
+                                                    }
+                                                    aria-label={bitsT.confettiSound}
+                                                    className="!w-full !max-w-none min-w-0"
+                                                    options={BITS_CONFETTI_SOUND_IDS.map((id) => ({
+                                                        value: id,
+                                                        label: bitsT.confettiSounds[id]
+                                                    }))}
+                                                />
+                                            </div>
+                                            <button
+                                                type="button"
+                                                disabled={bitsConfig.confettiSound === 'none'}
+                                                onClick={() =>
+                                                    playBitsConfettiSound(
+                                                        bitsConfig.confettiSound
+                                                    )
+                                                }
+                                                className="shrink-0 rounded-md border border-border-subtle px-2 py-1.5 text-[0.7rem] font-medium text-text-main transition hover:bg-white/5 disabled:cursor-not-allowed disabled:opacity-40"
+                                            >
+                                                {bitsT.confettiSoundPreview}
+                                            </button>
+                                        </div>
+                                    </label>
+                                </div>
+                            ) : null}
                         </div>
                     ) : null}
                 </div>

@@ -82,7 +82,13 @@ overlay: {
             scaleLabel: 'Tamanho',
             scaleSm: 'Pequeno',
             scaleMd: 'Normal',
-            scaleLg: 'Grande'
+            scaleLg: 'Grande',
+            bitsRouletteTitle: 'Aparência da roleta',
+            bitsRouletteHint: 'Banner ao girar, cartão do prémio, confete e som.',
+            bitsMessageTitle: 'Aparência da mensagem',
+            bitsMessageHint: 'Estilo do cartão do texto no OBS.',
+            bitsImageTitle: 'Aparência da imagem',
+            bitsImageHint: 'Tempo no ecrã, quem cheerou e efeito ao aparecer.'
         },
         questions: {
             now: 'Pergunta atual',

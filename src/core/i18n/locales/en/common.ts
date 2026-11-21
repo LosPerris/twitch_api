@@ -19,9 +19,9 @@ header: {
             slots: 'Simple slot machine for chat',
             questions: 'Collect and manage chat questions',
             bitsRoulette: 'Reactions when you receive bits',
-            alertFollow: 'Announce when someone follows you',
-            alertSub: 'Announce new subscriptions',
-            alertRaid: 'Announce incoming raids',
+            alertFollow: 'Under construction — follow alerts',
+            alertSub: 'Under construction — subscription alerts',
+            alertRaid: 'Under construction — raid alerts',
             feedback: 'Send suggestions or report bugs',
             default: 'Dashboard'
         },

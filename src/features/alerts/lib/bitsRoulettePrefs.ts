@@ -5,6 +5,7 @@ import {
     DEFAULT_BITS_ROULETTE_URL,
     normalizeImageUrl,
     normalizeMessageTemplate,
+    normalizeOptionalMessage,
     normalizePrizeOptions,
     normalizeReactionMode,
     normalizeSpinBanner,
@@ -17,6 +18,7 @@ export function readBitsRoulettePrefs(userId?: string, maxOptions?: number): Bit
         const raw = readScopedPref(BITS_ROULETTE_PREF, userId);
         if (!raw) return { ...DEFAULT_BITS_ROULETTE_URL };
         const parsed = JSON.parse(raw) as Partial<BitsRouletteUrlConfig>;
+        const reactionMode = normalizeReactionMode(parsed.reactionMode);
         return {
             threshold: Number(parsed.threshold) || DEFAULT_BITS_ROULETTE_URL.threshold,
             matchMode: parsed.matchMode === 'min' ? 'min' : 'exact',
@@ -29,9 +31,12 @@ export function readBitsRoulettePrefs(userId?: string, maxOptions?: number): Bit
             cardStyle: parsed.cardStyle === 'solid' ? 'solid' : 'glass',
             winnerHoldSec: normalizeWinnerHoldSec(parsed.winnerHoldSec),
             spinBanner: normalizeSpinBanner(parsed.spinBanner),
-            reactionMode: normalizeReactionMode(parsed.reactionMode),
+            reactionMode,
             imageUrl: normalizeImageUrl(parsed.imageUrl),
-            messageTemplate: normalizeMessageTemplate(parsed.messageTemplate)
+            messageTemplate:
+                reactionMode === 'image'
+                    ? normalizeOptionalMessage(parsed.messageTemplate)
+                    : normalizeMessageTemplate(parsed.messageTemplate)
         };
     } catch {
         return { ...DEFAULT_BITS_ROULETTE_URL };

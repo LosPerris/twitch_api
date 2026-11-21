@@ -43,12 +43,29 @@ function decodeBase64UrlJson(token: string): string {
     return new TextDecoder().decode(bytes);
 }
 
-/** Lee profile_image_url del overlayToken (payload público; sin verificar firma). */
+/** Solo CDN de Twitch: el payload del token no se firma en cliente. */
+function isTwitchCdnAvatarUrl(url: string): boolean {
+    try {
+        const parsed = new URL(url);
+        return (
+            parsed.protocol === 'https:' &&
+            (parsed.hostname === 'static-cdn.jtvnw.net' || parsed.hostname.endsWith('.jtvnw.net'))
+        );
+    } catch {
+        return false;
+    }
+}
+
+/**
+ * Avatar desde payload del overlayToken solo si es CDN Twitch.
+ * Preferir siempre profile_image_url de overlay-exchange / sesión verificada.
+ */
 function channelAvatarFromOverlayToken(token?: string): string | null {
     if (!token) return null;
     try {
         const data = JSON.parse(decodeBase64UrlJson(token)) as { profile_image_url?: string };
-        return data.profile_image_url?.trim() || null;
+        const url = data.profile_image_url?.trim() || '';
+        return url && isTwitchCdnAvatarUrl(url) ? url : null;
     } catch {
         return null;
     }
@@ -481,11 +498,42 @@ function OverlayBitsRouletteContent({ session }: { session: Session }) {
                                     ) : null}
                                 </div>
                             ) : (
-                                <img
-                                    src={urlConfig.imageUrl}
-                                    alt=""
-                                    className="max-h-[min(80vh,32rem)] max-w-[min(100%,42rem)] object-contain"
-                                />
+                                <div className="flex max-w-[min(100%,42rem)] flex-col items-center gap-3">
+                                    <img
+                                        src={urlConfig.imageUrl}
+                                        alt=""
+                                        className="max-h-[min(70vh,28rem)] max-w-full object-contain"
+                                    />
+                                    {urlConfig.messageTemplate.trim() ? (
+                                        <p className="px-2 text-center text-[1.05rem] font-semibold leading-snug text-white">
+                                            {parseSpinBannerParts(
+                                                urlConfig.messageTemplate,
+                                                display.lastCheer.userName || '',
+                                                display.lastCheer.bits
+                                            ).map((part, i) =>
+                                                part.type === 'var' ? (
+                                                    <span
+                                                        key={`${part.key}-${i}`}
+                                                        className="font-extrabold"
+                                                        style={{ color: bannerPalette.primaryHex }}
+                                                    >
+                                                        {part.value}
+                                                    </span>
+                                                ) : (
+                                                    <span key={`t-${i}`}>{part.value}</span>
+                                                )
+                                            )}
+                                        </p>
+                                    ) : null}
+                                    {urlConfig.showDonor && display.lastCheer.userName ? (
+                                        <p className="text-[0.8rem] text-white/75">
+                                            {aT.donorLabel.replace(
+                                                '{name}',
+                                                display.lastCheer.userName
+                                            )}
+                                        </p>
+                                    ) : null}
+                                </div>
                             )}
                         </div>
                     </div>

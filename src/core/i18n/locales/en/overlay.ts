@@ -82,7 +82,13 @@ overlay: {
             scaleLabel: 'Size',
             scaleSm: 'Small',
             scaleMd: 'Normal',
-            scaleLg: 'Large'
+            scaleLg: 'Large',
+            bitsRouletteTitle: 'Roulette appearance',
+            bitsRouletteHint: 'Spin banner, prize card, confetti, and sound.',
+            bitsMessageTitle: 'Message appearance',
+            bitsMessageHint: 'Card style for the text on OBS.',
+            bitsImageTitle: 'Image appearance',
+            bitsImageHint: 'On-screen time, who cheered, and appear effect.'
         },
         questions: {
             now: 'Current question',

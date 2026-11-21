@@ -83,6 +83,14 @@ export function normalizeMessageTemplate(raw: unknown): string {
     return text || DEFAULT_BITS_MESSAGE_TEMPLATE;
 }
 
+/** Texto bajo la imagen: vacío = solo imagen. */
+export function normalizeOptionalMessage(raw: unknown): string {
+    return String(raw ?? '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, BITS_MESSAGE_TEMPLATE_MAX);
+}
+
 export function isValidBitsImageUrl(raw: string): boolean {
     const url = raw.trim();
     if (!url.startsWith(HTTPS_IMAGE_PREFIX)) return false;
@@ -283,10 +291,19 @@ export function parseBitsRouletteUrlConfig(
     const msgRaw = params.get('msg');
     if (msgRaw) {
         try {
-            messageTemplate = normalizeMessageTemplate(decodeURIComponent(msgRaw));
+            const decoded = decodeURIComponent(msgRaw);
+            messageTemplate =
+                reactionMode === 'image'
+                    ? normalizeOptionalMessage(decoded)
+                    : normalizeMessageTemplate(decoded);
         } catch {
-            messageTemplate = normalizeMessageTemplate(msgRaw);
+            messageTemplate =
+                reactionMode === 'image'
+                    ? normalizeOptionalMessage(msgRaw)
+                    : normalizeMessageTemplate(msgRaw);
         }
+    } else if (reactionMode === 'image') {
+        messageTemplate = '';
     }
 
     return {
@@ -361,9 +378,18 @@ export function appendBitsRouletteParams(
         const img = normalizeImageUrl(config.imageUrl);
         if (mode === 'image' && img) urlObj.searchParams.set('img', encodeURIComponent(img));
         else urlObj.searchParams.delete('img');
-        const msgTpl = normalizeMessageTemplate(config.messageTemplate);
-        if (mode === 'message') urlObj.searchParams.set('msg', encodeURIComponent(msgTpl));
-        else urlObj.searchParams.delete('msg');
+        if (mode === 'message') {
+            urlObj.searchParams.set(
+                'msg',
+                encodeURIComponent(normalizeMessageTemplate(config.messageTemplate))
+            );
+        } else if (mode === 'image') {
+            const caption = normalizeOptionalMessage(config.messageTemplate);
+            if (caption) urlObj.searchParams.set('msg', encodeURIComponent(caption));
+            else urlObj.searchParams.delete('msg');
+        } else {
+            urlObj.searchParams.delete('msg');
+        }
         return urlObj.toString();
     } catch {
         return rawUrl;
