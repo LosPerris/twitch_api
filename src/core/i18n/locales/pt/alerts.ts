@@ -2,8 +2,17 @@
 export const alerts = {
 alerts: {
         bitsRoulette: {
-            title: 'Roleta por bits',
-            desc: 'Quando alguém cheer a quantidade que escolheres, a roleta gira sozinha no OBS com os teus prémios.',
+            title: 'Bits',
+            desc: 'Quando alguém cheer a quantidade que escolheres, reage no OBS: roleta, mensagem ou imagem.',
+            reactionMode: 'Reação',
+            reactionModeRoulette: 'Roleta',
+            reactionModeMessage: 'Mensagem',
+            reactionModeImage: 'Imagem',
+            imageUrl: 'URL da imagem (https)',
+            imageUrlPlaceholder: 'https://exemplo.com/imagem.png',
+            imageUrlError: 'Usa um URL público que comece por https:// (máx. 500 caracteres).',
+            messageTemplate: 'Modelo da mensagem',
+            messageTemplateHint: 'Marcadores: {name} e {bits}',
             triggerTitle: 'Disparo',
             enabled: 'Ativar alerta',
             threshold: 'Bits',
@@ -66,6 +75,80 @@ alerts: {
             spinBannerVars: 'Variáveis disponíveis:',
             spinBannerInsertVar: 'Inserir {var}',
             spinBannerDefault: '{name} girou a roleta com {bits} bits'
+        },
+        eventAlert: {
+            follow: {
+                title: 'Follows',
+                desc: 'Anuncie no chat quando alguém novo seguir você.',
+                enabled: 'Ativar alerta',
+                enabledOn: 'Alerta de follows ativado',
+                enabledOff: 'Alerta de follows desativado',
+                reactionMode: 'Reação',
+                reactionModeMessage: 'Mensagem',
+                reactionModeImage: 'Imagem',
+                messageTemplate: 'Modelo da mensagem',
+                messageTemplateHint: 'Placeholders: {name}',
+                imageUrl: 'URL da imagem (https)',
+                imageUrlPlaceholder: 'https://exemplo.com/imagem.png',
+                imageUrlError: 'Use uma URL pública que comece com https://.',
+                imageStoredNote: 'A imagem fica guardada para o overlay futuro; hoje só funciona mensagem no chat.',
+                overlayLaterNote:
+                    'Overlay de follows em breve. Com «Mensagem» o canal escreve no chat ao receber o evento.',
+                hint: 'Requer EventSub em produção (HTTPS). Em local o toggle só guarda preferências.',
+                save: 'Guardar',
+                saving: 'A guardar…',
+                saved: 'Configuração guardada',
+                saveError: 'Não foi possível guardar',
+                loadError: 'Não foi possível carregar o alerta'
+            },
+            subscribe: {
+                title: 'Subs',
+                desc: 'Anuncie no chat em nova inscrição.',
+                enabled: 'Ativar alerta',
+                enabledOn: 'Alerta de subs ativado',
+                enabledOff: 'Alerta de subs desativado',
+                reactionMode: 'Reação',
+                reactionModeMessage: 'Mensagem',
+                reactionModeImage: 'Imagem',
+                messageTemplate: 'Modelo da mensagem',
+                messageTemplateHint: 'Placeholders: {name}, {tier}',
+                imageUrl: 'URL da imagem (https)',
+                imageUrlPlaceholder: 'https://exemplo.com/imagem.png',
+                imageUrlError: 'Use uma URL pública que comece com https://.',
+                imageStoredNote: 'A imagem fica guardada para o overlay futuro; hoje só funciona mensagem no chat.',
+                overlayLaterNote:
+                    'Overlay de subs em breve. Com «Mensagem» o canal escreve no chat ao receber o evento.',
+                hint: 'Requer EventSub em produção (HTTPS).',
+                save: 'Guardar',
+                saving: 'A guardar…',
+                saved: 'Configuração guardada',
+                saveError: 'Não foi possível guardar',
+                loadError: 'Não foi possível carregar o alerta'
+            },
+            raid: {
+                title: 'Raids',
+                desc: 'Anuncie no chat quando receber um raid.',
+                enabled: 'Ativar alerta',
+                enabledOn: 'Alerta de raids ativado',
+                enabledOff: 'Alerta de raids desativado',
+                reactionMode: 'Reação',
+                reactionModeMessage: 'Mensagem',
+                reactionModeImage: 'Imagem',
+                messageTemplate: 'Modelo da mensagem',
+                messageTemplateHint: 'Placeholders: {name}, {viewers}',
+                imageUrl: 'URL da imagem (https)',
+                imageUrlPlaceholder: 'https://exemplo.com/imagem.png',
+                imageUrlError: 'Use uma URL pública que comece com https://.',
+                imageStoredNote: 'A imagem fica guardada para o overlay futuro; hoje só funciona mensagem no chat.',
+                overlayLaterNote:
+                    'Overlay de raids em breve. Com «Mensagem» o canal escreve no chat ao receber o evento.',
+                hint: 'Requer EventSub em produção (HTTPS).',
+                save: 'Guardar',
+                saving: 'A guardar…',
+                saved: 'Configuração guardada',
+                saveError: 'Não foi possível guardar',
+                loadError: 'Não foi possível carregar o alerta'
+            }
         }
     }
 };

@@ -7,6 +7,7 @@ import {
 
 export type BitsMatchMode = 'exact' | 'min';
 export type BitsWinnerCardStyle = 'glass' | 'solid';
+export type BitsReactionMode = 'roulette' | 'message' | 'image';
 export type { BitsConfettiSoundId };
 
 export interface BitsRouletteUrlConfig {
@@ -24,7 +25,14 @@ export interface BitsRouletteUrlConfig {
     winnerHoldSec: number;
     /** Texto encima de la ruleta mientras gira. Vacío = oculto. Placeholders: {name} {bits} */
     spinBanner: string;
+    reactionMode: BitsReactionMode;
+    /** URL pública https (modo imagen). */
+    imageUrl: string;
+    /** Plantilla del banner (modo mensaje). Placeholders: {name} {bits} */
+    messageTemplate: string;
 }
+
+export const DEFAULT_BITS_MESSAGE_TEMPLATE = '{name} cheerió {bits} bits';
 
 export const DEFAULT_BITS_ROULETTE_URL: BitsRouletteUrlConfig = {
     threshold: 100,
@@ -37,7 +45,10 @@ export const DEFAULT_BITS_ROULETTE_URL: BitsRouletteUrlConfig = {
     confettiSound: 'none',
     cardStyle: 'glass',
     winnerHoldSec: 10,
-    spinBanner: ''
+    spinBanner: '',
+    reactionMode: 'roulette',
+    imageUrl: '',
+    messageTemplate: DEFAULT_BITS_MESSAGE_TEMPLATE
 };
 
 export const BITS_WINNER_HOLD_MIN_SEC = 3;
@@ -51,6 +62,43 @@ export function normalizeWinnerHoldSec(raw: unknown): number {
 
 export const DEFAULT_BITS_SPIN_BANNER = '{name} giró la ruleta con {bits} bits';
 export const BITS_SPIN_BANNER_MAX = 80;
+export const BITS_MESSAGE_TEMPLATE_MAX = 120;
+export const BITS_IMAGE_URL_MAX = 500;
+
+const HTTPS_IMAGE_PREFIX = 'https://';
+
+export function normalizeReactionMode(raw: unknown): BitsReactionMode {
+    const v = String(raw ?? '')
+        .trim()
+        .toLowerCase();
+    if (v === 'message' || v === 'image') return v;
+    return 'roulette';
+}
+
+export function normalizeMessageTemplate(raw: unknown): string {
+    const text = String(raw ?? '')
+        .replace(/\s+/g, ' ')
+        .trim()
+        .slice(0, BITS_MESSAGE_TEMPLATE_MAX);
+    return text || DEFAULT_BITS_MESSAGE_TEMPLATE;
+}
+
+export function isValidBitsImageUrl(raw: string): boolean {
+    const url = raw.trim();
+    if (!url.startsWith(HTTPS_IMAGE_PREFIX)) return false;
+    if (url.length > BITS_IMAGE_URL_MAX) return false;
+    try {
+        const parsed = new URL(url);
+        return parsed.protocol === 'https:';
+    } catch {
+        return false;
+    }
+}
+
+export function normalizeImageUrl(raw: unknown): string {
+    const url = String(raw ?? '').trim().slice(0, BITS_IMAGE_URL_MAX);
+    return isValidBitsImageUrl(url) ? url : '';
+}
 
 export const BITS_ROULETTE_PREF = 'bits_roulette_url_config';
 
@@ -221,6 +269,26 @@ export function parseBitsRouletteUrlConfig(
     const cardRaw = (params.get('card') || '').toLowerCase();
     const cardStyle: BitsWinnerCardStyle = cardRaw === 'solid' ? 'solid' : 'glass';
 
+    const reactionMode = normalizeReactionMode(params.get('mode'));
+    let imageUrl = '';
+    const imgRaw = params.get('img');
+    if (imgRaw) {
+        try {
+            imageUrl = normalizeImageUrl(decodeURIComponent(imgRaw));
+        } catch {
+            imageUrl = normalizeImageUrl(imgRaw);
+        }
+    }
+    let messageTemplate = DEFAULT_BITS_MESSAGE_TEMPLATE;
+    const msgRaw = params.get('msg');
+    if (msgRaw) {
+        try {
+            messageTemplate = normalizeMessageTemplate(decodeURIComponent(msgRaw));
+        } catch {
+            messageTemplate = normalizeMessageTemplate(msgRaw);
+        }
+    }
+
     return {
         threshold,
         matchMode,
@@ -234,7 +302,10 @@ export function parseBitsRouletteUrlConfig(
         winnerHoldSec: normalizeWinnerHoldSec(
             params.get('hold') || DEFAULT_BITS_ROULETTE_URL.winnerHoldSec
         ),
-        spinBanner: decodeBannerParam(params.get('banner'))
+        spinBanner: decodeBannerParam(params.get('banner')),
+        reactionMode,
+        imageUrl,
+        messageTemplate
     };
 }
 
@@ -284,6 +355,15 @@ export function appendBitsRouletteParams(
         const banner = normalizeSpinBanner(config.spinBanner);
         if (banner) urlObj.searchParams.set('banner', encodeBannerParam(banner));
         else urlObj.searchParams.delete('banner');
+        const mode = normalizeReactionMode(config.reactionMode);
+        if (mode !== 'roulette') urlObj.searchParams.set('mode', mode);
+        else urlObj.searchParams.delete('mode');
+        const img = normalizeImageUrl(config.imageUrl);
+        if (mode === 'image' && img) urlObj.searchParams.set('img', encodeURIComponent(img));
+        else urlObj.searchParams.delete('img');
+        const msgTpl = normalizeMessageTemplate(config.messageTemplate);
+        if (mode === 'message') urlObj.searchParams.set('msg', encodeURIComponent(msgTpl));
+        else urlObj.searchParams.delete('msg');
         return urlObj.toString();
     } catch {
         return rawUrl;

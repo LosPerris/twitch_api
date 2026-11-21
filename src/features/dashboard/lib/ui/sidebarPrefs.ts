@@ -1,5 +1,8 @@
+import type { DashboardTab } from '@/core/config/config';
+
 const SIDEBAR_COLLAPSED_PREF = 'dashboard_sidebar_collapsed';
 const SIDEBAR_SECTIONS_PREF = 'dashboard_sidebar_sections';
+const SIDEBAR_FAVORITES_PREF = 'dashboard_sidebar_favorites';
 
 /** Categorías que el user puede contraer (General queda siempre visible). */
 export const COLLAPSIBLE_NAV_CATEGORIES = [
@@ -69,5 +72,25 @@ export function writeSidebarSectionsPref(sections: Record<CollapsibleNavCategory
         localStorage.setItem(SIDEBAR_SECTIONS_PREF, JSON.stringify(sections));
     } catch {
         /* ignore quota / private mode */
+    }
+}
+
+export function readSidebarFavoritesPref(): DashboardTab[] {
+    try {
+        const raw = localStorage.getItem(SIDEBAR_FAVORITES_PREF);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw) as unknown;
+        if (!Array.isArray(parsed)) return [];
+        return parsed.filter((id): id is DashboardTab => typeof id === 'string');
+    } catch {
+        return [];
+    }
+}
+
+export function writeSidebarFavoritesPref(favorites: DashboardTab[]): void {
+    try {
+        localStorage.setItem(SIDEBAR_FAVORITES_PREF, JSON.stringify(favorites.slice(0, 8)));
+    } catch {
+        /* ignore */
     }
 }

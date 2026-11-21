@@ -10,6 +10,10 @@ clips: {
         searchPlaceholder: 'Buscar por título ou criador...',
         sortLabel: 'Ordenar por',
         noClips: 'Nenhum clip encontrado.',
+        permissionsNeeded:
+            'Falta a permissão da Twitch para gerenciar clips. Reautorize para listar e baixar MP4.',
+        emptyCtaPermissions: 'Atualizar permissões',
+        emptyCtaCommand: 'Ir ao gerador',
         viewClip: 'Ver Clip',
         playClip: (title: string): string => `Reproduzir clip: ${title}`,
         favorite: 'Adicionar aos favoritos',

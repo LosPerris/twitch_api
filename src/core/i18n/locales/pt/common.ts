@@ -18,6 +18,10 @@ header: {
             duel: 'Batalhas 1vs1 entre espectadores',
             slots: 'Caça-níqueis simples para o chat',
             questions: 'Colete e gerencie perguntas do chat',
+            bitsRoulette: 'Reações quando você recebe bits',
+            alertFollow: 'Anúncios quando alguém seguir você',
+            alertSub: 'Anúncios em novas inscrições',
+            alertRaid: 'Anúncios em raids',
             feedback: 'Envie sugestões ou reporte bugs',
             default: 'Painel'
         },
@@ -53,7 +57,10 @@ sidebar: {
             trends: 'Tendências',
             stalker: 'Stalker',
             roulette: 'Roleta',
-            bitsRoulette: 'Roleta Bits',
+            bitsRoulette: 'Bits',
+            alertFollow: 'Follows',
+            alertSub: 'Subs',
+            alertRaid: 'Raids',
             magic8: 'Bola 8 Mágica',
             russian: 'Roleta Russa',
             duel: 'Duelo',
@@ -68,7 +75,12 @@ sidebar: {
         collapseMenu: 'Recolher menu',
         expandMenu: 'Expandir menu',
         collapseSection: (name: string): string => `Recolher ${name}`,
-        expandSection: (name: string): string => `Expandir ${name}`
+        expandSection: (name: string): string => `Expandir ${name}`,
+        searchPlaceholder: 'Buscar…',
+        favorites: 'Favoritos',
+        pinFavorite: 'Fixar favorito',
+        unpinFavorite: 'Remover favorito',
+        noSearchResults: 'Sem resultados'
     },
 
 common: {
@@ -255,7 +267,7 @@ globals: {
             commands: 'Carregando comandos',
             trends: 'Carregando tendências',
             stalker: 'Carregando stalker',
-            bitsRoulette: 'Carregando roleta bits',
+            bitsRoulette: 'Carregando bits',
             settings: 'Carregando configurações',
             starting: 'Iniciando...'
         },

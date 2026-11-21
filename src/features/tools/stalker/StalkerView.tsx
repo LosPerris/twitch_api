@@ -18,6 +18,7 @@ import { useTranslation } from '@/core/i18n/I18nContext';
 import { useDebounce } from '@/shared/hooks/useDebounce';
 import { useToolFocus } from '@/features/dashboard/lib/ui/ToolFocusContext';
 import { ToolPanelHeader } from '@/features/tools/components/ToolPanelHeader';
+import { UpdateTwitchPermissionsCallout } from '@/features/dashboard/components/UpdateTwitchPermissions';
 
 const LISTENER_ID = 'stalker';
 const CHATTERS_CLIENT_TTL_MS = 40_000;
@@ -205,6 +206,11 @@ export function StalkerView({ active = true }: { active?: boolean }) {
     return (
         <>
             <div className={`${toolPanelShell(focusMode)} ${focusMode ? 'min-h-0' : fadeIn}`}>
+                <UpdateTwitchPermissionsCallout
+                    hints={['chatters']}
+                    message={stalker.permissionsNeeded}
+                    className="mx-5 mt-4 mb-0"
+                />
                 <ToolPanelHeader
                     icon={Users}
                     title={stalker.title}

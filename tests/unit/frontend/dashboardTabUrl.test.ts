@@ -37,11 +37,17 @@ describe('dashboardTabUrl', () => {
         expect(parseTabFromPathname(`${BASE}/bits/roulette`)).toBe('bitsRoulette');
         expect(parseTabFromPathname(`${BASE}/bitsRoulette`)).toBe('bitsRoulette');
         expect(parseTabFromPathname(`${BASE}/bits/unknown`)).toBeNull();
+        expect(parseTabFromPathname(`${BASE}/alerts/follow`)).toBe('alertFollow');
+        expect(parseTabFromPathname(`${BASE}/alerts/subscribe`)).toBe('alertSub');
+        expect(parseTabFromPathname(`${BASE}/alerts/raid`)).toBe('alertRaid');
         expect(parseTabFromPathname(`${BASE}/unknown`)).toBeNull();
     });
 
     it('publica la ruleta de bits en /dashboard/bits/roulette', () => {
         expect(dashboardTabPath('bitsRoulette')).toBe(`${BASE}/bits/roulette`);
+        expect(dashboardTabPath('alertFollow')).toBe(`${BASE}/alerts/follow`);
+        expect(dashboardTabPath('alertSub')).toBe(`${BASE}/alerts/subscribe`);
+        expect(dashboardTabPath('alertRaid')).toBe(`${BASE}/alerts/raid`);
         expect(dashboardTabPath('home')).toBe(BASE);
         expect(dashboardTabPath('clips')).toBe(`${BASE}/clips`);
     });

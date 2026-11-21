@@ -9,7 +9,8 @@ export type OnboardingStepId =
     | 'home-activity'
     | 'home-resources'
     | 'followage'
-    | 'analytics';
+    | 'analytics'
+    | 'overlay-setup';
 
 export type OnboardingTourStep = {
     id: OnboardingStepId;
@@ -24,5 +25,6 @@ export const ONBOARDING_TOUR_STEPS: readonly OnboardingTourStep[] = [
     { id: 'home-activity',  target: '[data-tour="home-activity"]',  tab: 'home' },
     { id: 'home-resources', target: '[data-tour="home-resources"]', tab: 'home' },
     { id: 'analytics',      target: '[data-tour="analytics"]',      tab: 'analytics' },
-    { id: 'followage',      target: '[data-tour="command-generator"]', tab: 'followage' }
+    { id: 'followage',      target: '[data-tour="command-generator"]', tab: 'followage' },
+    { id: 'overlay-setup',  target: '[data-tour="overlay-setup"]',  tab: 'trends' }
 ];

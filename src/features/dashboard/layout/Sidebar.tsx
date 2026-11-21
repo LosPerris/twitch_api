@@ -5,7 +5,9 @@ import { NAV_ITEMS, type NavItem } from '@/features/dashboard/lib/tabs/dashboard
 import {
     COLLAPSIBLE_NAV_CATEGORIES,
     isCollapsibleNavCategory,
+    readSidebarFavoritesPref,
     readSidebarSectionsPref,
+    writeSidebarFavoritesPref,
     writeSidebarSectionsPref,
     type CollapsibleNavCategory
 } from '@/features/dashboard/lib/ui/sidebarPrefs';
@@ -22,7 +24,7 @@ import {
 } from '@/core/utils/tw';
 import { AppLogo } from '@/shared/ui/AppLogo';
 import { IconMd } from '@/shared/ui/Icon';
-import { ChevronDown, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { ChevronDown, PanelLeftClose, PanelLeftOpen, Search, Star } from 'lucide-react';
 import { useTranslation } from '@/core/i18n/I18nContext';
 import { useRequiredSession } from '@/core/session/useSession';
 import {
@@ -99,10 +101,34 @@ export function Sidebar({
         width: number;
         height: number;
     } | null>(null);
+    const [navQuery, setNavQuery] = useState('');
+    const [favorites, setFavorites] = useState<DashboardTab[]>(() => readSidebarFavoritesPref());
     const [openSections, setOpenSections] = useState(readSidebarSectionsPref);
     const isDesktop = useIsDesktopLg();
     const railCollapsed = collapsed && isDesktop;
-    const navGroups = useMemo(() => groupMainNav(MAIN_NAV), []);
+    const queryNorm = navQuery.trim().toLowerCase();
+    const filteredNav = useMemo(() => {
+        if (!queryNorm) return MAIN_NAV;
+        return MAIN_NAV.filter((item) => {
+            const label = t.sidebar.items[item.id as keyof typeof t.sidebar.items] ?? item.label;
+            return label.toLowerCase().includes(queryNorm) || item.id.toLowerCase().includes(queryNorm);
+        });
+    }, [queryNorm, t]);
+    const navGroups = useMemo(() => groupMainNav(filteredNav), [filteredNav]);
+    const favoriteItems = useMemo(
+        () =>
+            favorites
+                .map((id) => MAIN_NAV.find((item) => item.id === id))
+                .filter((item): item is NavItem => Boolean(item)),
+        [favorites]
+    );
+    const toggleFavorite = (id: DashboardTab) => {
+        setFavorites((prev) => {
+            const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id].slice(0, 8);
+            writeSidebarFavoritesPref(next);
+            return next;
+        });
+    };
     const displayName = session.displayName ?? session.login ?? 'Streamer';
     const loginLabel =
         session.login && session.login.toLowerCase() !== (session.displayName ?? '').toLowerCase()
@@ -303,6 +329,19 @@ export function Sidebar({
                 </div>
 
                 <nav data-tour="sidebar-nav" className={sidebarNavScroll} aria-label={t.sidebar.navigation}>
+                    {!railCollapsed ? (
+                        <div className="relative mb-2 px-2">
+                            <Search className="pointer-events-none absolute top-1/2 left-4 size-3.5 -translate-y-1/2 text-text-muted" />
+                            <input
+                                type="search"
+                                value={navQuery}
+                                onChange={(e) => setNavQuery(e.target.value)}
+                                placeholder={t.sidebar.searchPlaceholder}
+                                aria-label={t.sidebar.searchPlaceholder}
+                                className="w-full rounded-lg border border-border-subtle bg-bg-main py-1.5 pr-2 pl-8 text-[0.75rem] text-text-main outline-none placeholder:text-text-muted focus:border-border-strong"
+                            />
+                        </div>
+                    ) : null}
                     <div ref={navListRef} className="relative">
                         {navPill ? (
                             <span
@@ -320,6 +359,40 @@ export function Sidebar({
                                 }}
                             />
                         ) : null}
+                        {!railCollapsed && !queryNorm && favoriteItems.length > 0 ? (
+                            <div className="mb-2">
+                                <p className="mb-1 px-3 text-[0.7rem] font-semibold uppercase tracking-[0.1em] text-text-muted">
+                                    {t.sidebar.favorites}
+                                </p>
+                                {favoriteItems.map((item) => {
+                                    const isActive = active === item.id;
+                                    const itemLabel =
+                                        t.sidebar.items[item.id as keyof typeof t.sidebar.items];
+                                    return (
+                                        <button
+                                            key={`fav-${item.id}`}
+                                            type="button"
+                                            onClick={() => {
+                                                onChange(item.id);
+                                                onClose();
+                                            }}
+                                            className={`${sidebarNavItem(isActive, false, Boolean(navPill))} relative z-[1]`}
+                                            aria-current={isActive ? 'page' : undefined}
+                                        >
+                                            <IconMd icon={item.icon} />
+                                            <span className={sidebarLabelClip(false)}>
+                                                {itemLabel}
+                                            </span>
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        ) : null}
+                        {queryNorm && filteredNav.length === 0 ? (
+                            <p className="px-3 py-2 text-[0.75rem] text-text-muted">
+                                {t.sidebar.noSearchResults}
+                            </p>
+                        ) : null}
                         {navGroups.map((group, groupIndex) => {
                             const catKey = group.category as keyof typeof t.sidebar.categories;
                             const categoryLabel = group.category
@@ -327,7 +400,7 @@ export function Sidebar({
                                 : '';
                             const collapsible = isCollapsibleNavCategory(group.category);
                             const isFlatTop = group.category === 'general';
-                            const sectionOpen = isSectionOpen(group.category);
+                            const sectionOpen = Boolean(queryNorm) || isSectionOpen(group.category);
                             const panelId = group.category
                                 ? `sidebar-section-${group.category}`
                                 : undefined;
@@ -418,9 +491,13 @@ export function Sidebar({
                                                 const inertSection =
                                                     collapsible && !railCollapsed && !sectionOpen;
 
+                                                const isFav = favorites.includes(item.id);
                                                 return (
-                                                    <button
+                                                    <div
                                                         key={item.id}
+                                                        className="group/nav relative"
+                                                    >
+                                                    <button
                                                         type="button"
                                                         ref={(el) => {
                                                             navBtnRefs.current.set(item.id, el);
@@ -430,7 +507,7 @@ export function Sidebar({
                                                             onChange(item.id);
                                                             onClose();
                                                         }}
-                                                        className={`${sidebarNavItem(isActive, railCollapsed, Boolean(navPill))} relative z-[1]`}
+                                                        className={`${sidebarNavItem(isActive, railCollapsed, Boolean(navPill))} relative z-[1] w-full`}
                                                         aria-label={itemLabel}
                                                         title={
                                                             railCollapsed ? itemLabel : undefined
@@ -457,6 +534,34 @@ export function Sidebar({
                                                             </span>
                                                         </div>
                                                     </button>
+                                                    {!railCollapsed && !inertSection ? (
+                                                        <button
+                                                            type="button"
+                                                            className={`absolute top-1/2 right-1.5 z-[2] -translate-y-1/2 rounded p-1 text-text-muted opacity-0 transition group-hover/nav:opacity-100 ${
+                                                                isFav ? 'opacity-100 text-primary' : ''
+                                                            }`}
+                                                            title={
+                                                                isFav
+                                                                    ? t.sidebar.unpinFavorite
+                                                                    : t.sidebar.pinFavorite
+                                                            }
+                                                            aria-label={
+                                                                isFav
+                                                                    ? t.sidebar.unpinFavorite
+                                                                    : t.sidebar.pinFavorite
+                                                            }
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                toggleFavorite(item.id);
+                                                            }}
+                                                        >
+                                                            <Star
+                                                                className={`size-3.5 ${isFav ? 'fill-current' : ''}`}
+                                                                aria-hidden
+                                                            />
+                                                        </button>
+                                                    ) : null}
+                                                    </div>
                                                 );
                                             })}
                                         </div>

@@ -5,6 +5,7 @@ import { apiFetch } from '@/core/auth';
 import { useRequiredSession } from '@/core/session/useSession';
 import { useTranslation } from '@/core/i18n/I18nContext';
 import { useToast } from '@/shared/ui/toast/ToastProvider';
+import { OverlayConnectionBadge } from '@/features/overlay/components/OverlayConnectionBadge';
 import { OverlayUrlButton } from '@/features/overlay/components/OverlayUrlButton';
 import { ToolPanelHeader } from '@/features/tools/components/ToolPanelHeader';
 import { SelectField } from '@/shared/ui/SelectField';
@@ -13,6 +14,8 @@ import { BitsRouletteSkeleton } from '@/shared/ui/skeletons/BitsRouletteSkeleton
 import {
     btnSecondary,
     fadeIn,
+    themeActiveChip,
+    themeIdleChip,
     toolConfigControl,
     toolConfigInput,
     toolHeaderIconBtn,
@@ -25,10 +28,16 @@ import {
 } from '@/features/alerts/lib/bitsRoulettePrefs';
 import { UpdateTwitchPermissionsCallout } from '@/features/dashboard/components/UpdateTwitchPermissions';
 import {
+    BITS_IMAGE_URL_MAX,
+    BITS_MESSAGE_TEMPLATE_MAX,
     BITS_ROULETTE_OPTIONS_MIN,
+    isValidBitsImageUrl,
     maxBitsRouletteOptionsForRole,
+    normalizeImageUrl,
+    normalizeMessageTemplate,
     normalizePrizeOptions,
     type BitsMatchMode,
+    type BitsReactionMode,
     type BitsRouletteUrlConfig
 } from '@/features/alerts/lib/bitsRouletteUrl';
 import { useDashboardPanel } from '@/features/dashboard/providers/DashboardPanelProvider';
@@ -66,6 +75,11 @@ export function BitsRouletteView({ active = true }: { active?: boolean }) {
     const [options, setOptions] = useState<string[]>(initial.options);
     const [cooldownSec, setCooldownSec] = useState(initial.cooldownSec);
     const [announceChat, setAnnounceChat] = useState(initial.announceChat);
+    const [reactionMode, setReactionMode] = useState<BitsReactionMode>(initial.reactionMode);
+    const [imageUrl, setImageUrl] = useState(initial.imageUrl);
+    const [messageTemplate, setMessageTemplate] = useState(initial.messageTemplate);
+    const [imageUrlDraft, setImageUrlDraft] = useState(initial.imageUrl);
+    const [imageUrlError, setImageUrlError] = useState(false);
 
     useEffect(() => {
         if (!active) return;
@@ -85,6 +99,10 @@ export function BitsRouletteView({ active = true }: { active?: boolean }) {
                 setOptions(cfg.options);
                 setCooldownSec(cfg.cooldownSec);
                 setAnnounceChat(cfg.announceChat);
+                setReactionMode(cfg.reactionMode);
+                setImageUrl(cfg.imageUrl);
+                setImageUrlDraft(cfg.imageUrl);
+                setMessageTemplate(cfg.messageTemplate);
             } catch {
                 if (!cancelled) showToast(aT.loadError, 'error');
             } finally {
@@ -105,24 +123,54 @@ export function BitsRouletteView({ active = true }: { active?: boolean }) {
     }, [maxOptions]);
 
     const saveLocalConfig = () => {
-        const cleaned = normalizePrizeOptions(options, maxOptions);
-        if (cleaned.length < BITS_ROULETTE_OPTIONS_MIN) {
-            showToast(aT.optionsMin, 'warning');
-            return;
-        }
         const prev = readBitsRoulettePrefs(session.userId, maxOptions);
+        const cleaned = normalizePrizeOptions(options, maxOptions);
+        let nextImageUrl = imageUrl;
+        const nextMessage = normalizeMessageTemplate(messageTemplate);
+
+        if (reactionMode === 'roulette') {
+            if (cleaned.length < BITS_ROULETTE_OPTIONS_MIN) {
+                showToast(aT.optionsMin, 'warning');
+                return;
+            }
+        }
+        if (reactionMode === 'image') {
+            const normalized = normalizeImageUrl(imageUrlDraft);
+            if (!normalized) {
+                setImageUrlError(true);
+                showToast(aT.imageUrlError, 'warning');
+                return;
+            }
+            nextImageUrl = normalized;
+            setImageUrl(normalized);
+            setImageUrlDraft(normalized);
+            setImageUrlError(false);
+        }
+
         const next: BitsRouletteUrlConfig = {
             ...prev,
             threshold,
             matchMode,
             options: cleaned,
             cooldownSec,
-            announceChat
+            announceChat,
+            reactionMode,
+            imageUrl: nextImageUrl,
+            messageTemplate: nextMessage
         };
         setOptions(cleaned);
+        setMessageTemplate(nextMessage);
         writeBitsRoulettePrefs(session.userId, next);
         showToast(aT.savedLocal, 'success');
     };
+
+    const reactionModes: { id: BitsReactionMode; label: string }[] = [
+        { id: 'roulette', label: aT.reactionModeRoulette },
+        { id: 'message', label: aT.reactionModeMessage },
+        { id: 'image', label: aT.reactionModeImage }
+    ];
+
+    const previewImageUrl = normalizeImageUrl(imageUrlDraft);
 
     const toggleEnabled = async (nextEnabled: boolean) => {
         setSaving(true);
@@ -270,6 +318,7 @@ export function BitsRouletteView({ active = true }: { active?: boolean }) {
                         >
                             <MessageSquare className="size-4" />
                         </button>
+                        <OverlayConnectionBadge tool="bits-roulette" active={active} compact />
                         <OverlayUrlButton tool="bits-roulette" compact />
                         <InfoTooltip text={aT.triggerHint} />
                     </>
@@ -283,6 +332,90 @@ export function BitsRouletteView({ active = true }: { active?: boolean }) {
                     className="mb-4"
                 />
 
+                <div className="mb-5">
+                    <p className="mb-2 text-[0.7rem] font-bold uppercase tracking-wide text-text-muted">
+                        {aT.reactionMode}
+                    </p>
+                    <div
+                        className="flex w-full items-center gap-1 rounded-xl border border-border-subtle bg-bg-secondary p-1"
+                        role="tablist"
+                        aria-label={aT.reactionMode}
+                    >
+                        {reactionModes.map(({ id, label }) => {
+                            const selected = reactionMode === id;
+                            return (
+                                <button
+                                    key={id}
+                                    type="button"
+                                    role="tab"
+                                    aria-selected={selected}
+                                    onClick={() => setReactionMode(id)}
+                                    className={`flex-1 rounded-lg py-2.5 text-[0.75rem] font-medium ${
+                                        selected ? themeActiveChip : themeIdleChip
+                                    }`}
+                                >
+                                    {label}
+                                </button>
+                            );
+                        })}
+                    </div>
+                </div>
+
+                {reactionMode === 'message' ? (
+                    <div className="mb-5 text-left">
+                        <label className="mb-2 block text-[0.7rem] font-bold uppercase tracking-wide text-text-muted">
+                            {aT.messageTemplate}
+                        </label>
+                        <input
+                            type="text"
+                            value={messageTemplate}
+                            maxLength={BITS_MESSAGE_TEMPLATE_MAX}
+                            onChange={(e) => setMessageTemplate(e.target.value)}
+                            placeholder={aT.messageTemplateHint}
+                            className={`${toolConfigInput} w-full`}
+                        />
+                        <p className="mt-1.5 text-[0.65rem] text-text-muted">{aT.messageTemplateHint}</p>
+                    </div>
+                ) : null}
+
+                {reactionMode === 'image' ? (
+                    <div className="mb-5 text-left">
+                        <label className="mb-2 block text-[0.7rem] font-bold uppercase tracking-wide text-text-muted">
+                            {aT.imageUrl}
+                        </label>
+                        <input
+                            type="url"
+                            value={imageUrlDraft}
+                            maxLength={BITS_IMAGE_URL_MAX}
+                            onChange={(e) => {
+                                setImageUrlDraft(e.target.value);
+                                setImageUrlError(
+                                    e.target.value.trim().length > 0 &&
+                                        !isValidBitsImageUrl(e.target.value)
+                                );
+                            }}
+                            placeholder={aT.imageUrlPlaceholder}
+                            aria-invalid={imageUrlError}
+                            className={`${toolConfigInput} w-full ${imageUrlError ? 'ring-1 ring-warning/60' : ''}`}
+                        />
+                        {imageUrlError ? (
+                            <p className="mt-1.5 text-[0.65rem] text-warning">{aT.imageUrlError}</p>
+                        ) : (
+                            <p className="mt-1.5 text-[0.65rem] text-text-muted">{aT.imageUrlPlaceholder}</p>
+                        )}
+                        {previewImageUrl ? (
+                            <div className="mt-3 overflow-hidden rounded-lg border border-border-subtle bg-bg-secondary p-2">
+                                <img
+                                    src={previewImageUrl}
+                                    alt=""
+                                    className="mx-auto max-h-40 w-auto max-w-full object-contain"
+                                />
+                            </div>
+                        ) : null}
+                    </div>
+                ) : null}
+
+                {reactionMode === 'roulette' ? (
                 <div className="text-left">
                     <div className="mb-2 flex items-center justify-between gap-2">
                         <p className="text-[0.7rem] font-bold uppercase tracking-wide text-text-muted">
@@ -348,6 +481,7 @@ export function BitsRouletteView({ active = true }: { active?: boolean }) {
                         ))}
                     </ul>
                 </div>
+                ) : null}
 
                 <div className="mt-5 flex flex-wrap items-center gap-2">
                     <button

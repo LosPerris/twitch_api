@@ -97,6 +97,9 @@ const DASHBOARD_TAB_SLUGS = new Set([
     'questions',
     'reports',
     'bitsRoulette',
+    'alertFollow',
+    'alertSub',
+    'alertRaid',
     'settings'
 ]);
 
@@ -108,9 +111,15 @@ function isDashboardTabRoute(path) {
     if (!path.startsWith(prefix)) return false;
     const segment = path.slice(prefix.length).split('/').filter(Boolean)[0];
     if (DASHBOARD_TAB_SLUGS.has(segment)) return true;
-    if (segment !== 'bits') return false;
-    const tool = path.slice(prefix.length).split('/').filter(Boolean)[1];
-    return tool === 'roulette';
+    if (segment === 'bits') {
+        const tool = path.slice(prefix.length).split('/').filter(Boolean)[1];
+        return tool === 'roulette';
+    }
+    if (segment === 'alerts') {
+        const slug = path.slice(prefix.length).split('/').filter(Boolean)[1];
+        return slug === 'follow' || slug === 'subscribe' || slug === 'raid';
+    }
+    return false;
 }
 
 /** @param {string | undefined} url */

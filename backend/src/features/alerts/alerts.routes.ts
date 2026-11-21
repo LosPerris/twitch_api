@@ -15,6 +15,11 @@ import {
     putBitsAlertHandler,
     testBitsAlertHandler
 } from './bitsRoulette.controller';
+import {
+    eventAlertPutSchema,
+    getEventAlertHandler,
+    putEventAlertHandler
+} from './eventAlert.controller';
 
 const router = Router();
 
@@ -47,6 +52,23 @@ router.post(
     csrfProtection,
     validate(bitsAlertTestSchema),
     testBitsAlertHandler
+);
+
+router.get(
+    '/event/:kind',
+    requireCookieSession,
+    globalRateLimiter,
+    getEventAlertHandler
+);
+
+router.put(
+    '/event/:kind',
+    requireCookieSession,
+    globalRateLimiter,
+    bitsRouletteConfigRateLimiter,
+    csrfProtection,
+    validate(eventAlertPutSchema),
+    putEventAlertHandler
 );
 
 export default router;

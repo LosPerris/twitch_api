@@ -2,8 +2,17 @@
 export const alerts = {
 alerts: {
         bitsRoulette: {
-            title: 'Ruleta por bits',
-            desc: 'Cuando alguien cheeréa la cantidad que elijas, la ruleta gira sola en OBS con tus premios.',
+            title: 'Bits',
+            desc: 'Cuando alguien cheeréa la cantidad que elijas, reacciona en OBS: ruleta, mensaje o imagen.',
+            reactionMode: 'Reacción',
+            reactionModeRoulette: 'Ruleta',
+            reactionModeMessage: 'Mensaje',
+            reactionModeImage: 'Imagen',
+            imageUrl: 'URL de imagen (https)',
+            imageUrlPlaceholder: 'https://ejemplo.com/imagen.png',
+            imageUrlError: 'Usa una URL pública que empiece por https:// (máx. 500 caracteres).',
+            messageTemplate: 'Plantilla del mensaje',
+            messageTemplateHint: 'Placeholders: {name} y {bits}',
             triggerTitle: 'Disparo',
             enabled: 'Activar alerta',
             threshold: 'Bits',
@@ -66,6 +75,80 @@ alerts: {
             spinBannerVars: 'Variables disponibles:',
             spinBannerInsertVar: 'Insertar {var}',
             spinBannerDefault: '{name} giró la ruleta con {bits} bits'
+        },
+        eventAlert: {
+            follow: {
+                title: 'Follows',
+                desc: 'Anuncia en el chat cuando alguien nuevo te sigue.',
+                enabled: 'Activar alerta',
+                enabledOn: 'Alerta de follows activada',
+                enabledOff: 'Alerta de follows desactivada',
+                reactionMode: 'Reacción',
+                reactionModeMessage: 'Mensaje',
+                reactionModeImage: 'Imagen',
+                messageTemplate: 'Plantilla del mensaje',
+                messageTemplateHint: 'Placeholders: {name}',
+                imageUrl: 'URL de imagen (https)',
+                imageUrlPlaceholder: 'https://ejemplo.com/imagen.png',
+                imageUrlError: 'Usa una URL pública que empiece por https://.',
+                imageStoredNote: 'La imagen se guarda para cuando haya overlay; hoy solo funciona el mensaje en chat.',
+                overlayLaterNote:
+                    'Overlay para follows llegará después. Con «Mensaje» el canal escribe en el chat al recibir el evento.',
+                hint: 'Requiere EventSub en producción (HTTPS). En local el toggle guarda preferencias sin escuchar Twitch.',
+                save: 'Guardar',
+                saving: 'Guardando…',
+                saved: 'Configuración guardada',
+                saveError: 'No se pudo guardar',
+                loadError: 'No se pudo cargar la alerta'
+            },
+            subscribe: {
+                title: 'Subs',
+                desc: 'Anuncia en el chat cuando hay una nueva suscripción.',
+                enabled: 'Activar alerta',
+                enabledOn: 'Alerta de subs activada',
+                enabledOff: 'Alerta de subs desactivada',
+                reactionMode: 'Reacción',
+                reactionModeMessage: 'Mensaje',
+                reactionModeImage: 'Imagen',
+                messageTemplate: 'Plantilla del mensaje',
+                messageTemplateHint: 'Placeholders: {name}, {tier}',
+                imageUrl: 'URL de imagen (https)',
+                imageUrlPlaceholder: 'https://ejemplo.com/imagen.png',
+                imageUrlError: 'Usa una URL pública que empiece por https://.',
+                imageStoredNote: 'La imagen se guarda para cuando haya overlay; hoy solo funciona el mensaje en chat.',
+                overlayLaterNote:
+                    'Overlay para subs llegará después. Con «Mensaje» el canal escribe en el chat al recibir el evento.',
+                hint: 'Requiere EventSub en producción (HTTPS).',
+                save: 'Guardar',
+                saving: 'Guardando…',
+                saved: 'Configuración guardada',
+                saveError: 'No se pudo guardar',
+                loadError: 'No se pudo cargar la alerta'
+            },
+            raid: {
+                title: 'Raids',
+                desc: 'Anuncia en el chat cuando recibes un raid.',
+                enabled: 'Activar alerta',
+                enabledOn: 'Alerta de raids activada',
+                enabledOff: 'Alerta de raids desactivada',
+                reactionMode: 'Reacción',
+                reactionModeMessage: 'Mensaje',
+                reactionModeImage: 'Imagen',
+                messageTemplate: 'Plantilla del mensaje',
+                messageTemplateHint: 'Placeholders: {name}, {viewers}',
+                imageUrl: 'URL de imagen (https)',
+                imageUrlPlaceholder: 'https://ejemplo.com/imagen.png',
+                imageUrlError: 'Usa una URL pública que empiece por https://.',
+                imageStoredNote: 'La imagen se guarda para cuando haya overlay; hoy solo funciona el mensaje en chat.',
+                overlayLaterNote:
+                    'Overlay para raids llegará después. Con «Mensaje» el canal escribe en el chat al recibir el evento.',
+                hint: 'Requiere EventSub en producción (HTTPS).',
+                save: 'Guardar',
+                saving: 'Guardando…',
+                saved: 'Configuración guardada',
+                saveError: 'No se pudo guardar',
+                loadError: 'No se pudo cargar la alerta'
+            }
         }
     }
 };

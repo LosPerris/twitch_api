@@ -78,6 +78,10 @@ home: {
                 followage: {
                     title: 'Command generator',
                     body: 'Copy the ready-to-use URL for Nightbot, StreamElements or any other bot. Choose the format, language and test the response directly from here.'
+                },
+                'overlay-setup': {
+                    title: 'OBS overlay',
+                    body: 'Open Overlay, copy the URL and paste it as a Browser Source in OBS or Streamlabs. The Connected badge confirms the layer responds.'
                 }
             }
         },

@@ -6,6 +6,12 @@ overlay: {
             aria: 'Configurar overlay',
             label: 'Overlay'
         },
+        badge: {
+            connected: 'Conectado',
+            noSignal: 'Sem sinal',
+            connecting: 'Conectando…',
+            unauthorized: 'Link inválido'
+        },
         setupModal: {
             titlePrefix: 'Overlay —',
             description: 'Siga as instruções para conectar o overlay ao seu software de streaming.',
@@ -55,7 +61,7 @@ overlay: {
                 trends: 'Tendências',
                 roulette: 'Roleta',
                 questions: 'Perguntas',
-                'bits-roulette': 'Roleta Bits'
+                'bits-roulette': 'Bits'
             },
             sizes: {
                 trends: (w: number, h: number): string =>

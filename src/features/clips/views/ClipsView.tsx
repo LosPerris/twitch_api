@@ -1,11 +1,25 @@
 import { useState } from 'react';
 import { ClipsGridSkeleton } from '@/shared/ui/Skeleton';
 import { InfoTooltip } from '@/shared/ui/InfoTooltip';
-import { panelCard, fadeIn, textInput, hoverSubtleControl, hoverSubtleBorderedRow } from '@/core/utils/tw';
+import {
+    panelCard,
+    fadeIn,
+    textInput,
+    hoverSubtleControl,
+    hoverSubtleBorderedRow,
+    btnSecondary
+} from '@/core/utils/tw';
 import { subtleIcon } from '@/shared/ui/subtleAccents';
 import { ClipPlayerOverlay } from '@/features/clips/components/ClipPlayerOverlay';
 import { SelectField } from '@/shared/ui/SelectField';
 import { ClipCommandView } from '@/features/clips/views/ClipCommandView';
+import {
+    UpdateTwitchPermissionsCallout,
+    UpdateTwitchPermissionsSheet,
+    missingPermissionHints,
+    useTwitchScopes
+} from '@/features/dashboard/components/UpdateTwitchPermissions';
+import { SimpleEmptyState } from '@/shared/ui/SimpleEmptyState';
 import {
     Star,
     RotateCw,
@@ -99,6 +113,9 @@ export function ClipsView({ active = true }: { active?: boolean }) {
 
     const [playingClip, setPlayingClip] = useState<Clip | null>(null);
     const [embedSession, setEmbedSession] = useState(0);
+    const [permOpen, setPermOpen] = useState(false);
+    const { scopes } = useTwitchScopes();
+    const missingClipsPerm = missingPermissionHints(scopes, ['clips']).length > 0;
 
     const openClipPlayer = (clip: Clip) => {
         setPlayingClip(clip);
@@ -112,6 +129,12 @@ export function ClipsView({ active = true }: { active?: boolean }) {
     return (
         <>
             <ClipCommandView />
+
+            <UpdateTwitchPermissionsCallout
+                hints={['clips']}
+                message={clipsT.permissionsNeeded}
+                className="mb-3"
+            />
 
             <div className={`${panelCard} ${fadeIn} mb-3 flex flex-col [animation-delay:60ms]`}>
                 <header className="flex items-center justify-between gap-3 border-b border-border-subtle px-5 py-3.5">
@@ -189,9 +212,35 @@ export function ClipsView({ active = true }: { active?: boolean }) {
                     {loading ? (
                         <ClipsGridSkeleton count={6} className={CLIPS_GRID} />
                     ) : filtered.length === 0 ? (
-                        <p className="py-8 text-center text-[0.8125rem] text-text-muted">
-                            {clipsT.noClips}
-                        </p>
+                        <SimpleEmptyState
+                            icon={Images}
+                            label={clipsT.noClips}
+                            className="py-10"
+                            action={
+                                <>
+                                    {missingClipsPerm ? (
+                                        <button
+                                            type="button"
+                                            className={btnSecondary}
+                                            onClick={() => setPermOpen(true)}
+                                        >
+                                            {clipsT.emptyCtaPermissions}
+                                        </button>
+                                    ) : null}
+                                    <button
+                                        type="button"
+                                        className={btnSecondary}
+                                        onClick={() => {
+                                            document
+                                                .querySelector('[data-tour="clip-command"]')
+                                                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }}
+                                    >
+                                        {clipsT.emptyCtaCommand}
+                                    </button>
+                                </>
+                            }
+                        />
                     ) : (
                         <>
                             <div className={CLIPS_GRID}>
@@ -359,6 +408,12 @@ export function ClipsView({ active = true }: { active?: boolean }) {
                     onDownload={() => void downloadClip(playingClip)}
                 />
             ) : null}
+
+            <UpdateTwitchPermissionsSheet
+                open={permOpen}
+                onClose={() => setPermOpen(false)}
+                hints={['clips']}
+            />
         </>
     );
 }

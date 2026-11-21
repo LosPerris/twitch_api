@@ -4,7 +4,7 @@ import { fadeIn } from '@/core/utils/tw';
 
 export function ClipCommandView() {
     return (
-        <div className={fadeIn}>
+        <div className={fadeIn} data-tour="clip-command">
             <CommandGeneratorCard config={COMMAND_CONFIG.clip} />
         </div>
     );

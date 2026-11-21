@@ -3,7 +3,10 @@ import { normalizeConfettiSound } from '@/features/alerts/lib/bitsConfettiSound'
 import {
     BITS_ROULETTE_PREF,
     DEFAULT_BITS_ROULETTE_URL,
+    normalizeImageUrl,
+    normalizeMessageTemplate,
     normalizePrizeOptions,
+    normalizeReactionMode,
     normalizeSpinBanner,
     normalizeWinnerHoldSec,
     type BitsRouletteUrlConfig
@@ -25,7 +28,10 @@ export function readBitsRoulettePrefs(userId?: string, maxOptions?: number): Bit
             confettiSound: normalizeConfettiSound(parsed.confettiSound),
             cardStyle: parsed.cardStyle === 'solid' ? 'solid' : 'glass',
             winnerHoldSec: normalizeWinnerHoldSec(parsed.winnerHoldSec),
-            spinBanner: normalizeSpinBanner(parsed.spinBanner)
+            spinBanner: normalizeSpinBanner(parsed.spinBanner),
+            reactionMode: normalizeReactionMode(parsed.reactionMode),
+            imageUrl: normalizeImageUrl(parsed.imageUrl),
+            messageTemplate: normalizeMessageTemplate(parsed.messageTemplate)
         };
     } catch {
         return { ...DEFAULT_BITS_ROULETTE_URL };

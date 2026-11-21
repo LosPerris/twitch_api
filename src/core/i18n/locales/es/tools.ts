@@ -20,6 +20,8 @@ tools: {
             btnStart: 'Iniciar',
             btnReload: 'Limpiar',
             tooltip: 'Lista quién escribe en el chat en tiempo real',
+            permissionsNeeded:
+                'Falta el permiso de Twitch para leer chatters. Reautoriza para escanear el chat.',
             table: {
                 user: 'Usuario',
                 message: 'Mensaje',
@@ -88,6 +90,8 @@ tools: {
             listUpdated: 'Lista actualizada',
             reloadUsers: 'Recargar usuarios',
             infoTooltip: "Sortea un ganador del chat: entra todo el mundo o con una palabra, y filtra por roles",
+            permissionsNeeded:
+                'Falta el permiso de Twitch para leer chatters. Reautoriza para sortear desde el chat.',
             spinBtn: 'Girar Ruleta',
             twitchDelay: 'Retraso de Twitch ~3s',
             waitingChat: 'Esperando al chat...',
@@ -108,6 +112,12 @@ tools: {
                 mods: 'Mods',
                 vips: 'VIPs',
                 viewers: 'Viewers'
+            },
+            guide: {
+                title: 'Pasos del sorteo',
+                stepEligibility: 'Elegibilidad',
+                stepSpin: 'Girar',
+                stepWinner: 'Ganador'
             }
         },
         questions: {

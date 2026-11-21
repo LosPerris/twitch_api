@@ -39,6 +39,7 @@ export const API_ENDPOINTS = {
     ALERTS_BITS_ROULETTE: `${API_BASE}/alerts/bits-roulette/`,
     ALERTS_BITS_ROULETTE_TEST: `${API_BASE}/alerts/bits-roulette/test-spin/`,
     ALERTS_BITS_ROULETTE_ANNOUNCE: `${API_BASE}/alerts/bits-roulette/announce/`,
+    eventAlert: (kind: 'follow' | 'subscribe' | 'raid') => `${API_BASE}/alerts/event/${kind}/`,
     EXPORT_CHECK: `${API_BASE}/dashboard/export-check/`,
     EXPORT_COMPLETE: `${API_BASE}/dashboard/export-complete/`,
     REVEAL_API_KEY: `${API_BASE}/dashboard/reveal-api-key/`,
@@ -97,6 +98,9 @@ export type DashboardTab =
     | 'slots'
     | 'questions'
     | 'bitsRoulette'
+    | 'alertFollow'
+    | 'alertSub'
+    | 'alertRaid'
     | 'settings';
 
 export interface Session {

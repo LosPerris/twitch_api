@@ -2,8 +2,17 @@
 export const alerts = {
 alerts: {
         bitsRoulette: {
-            title: 'Bits roulette',
-            desc: 'When someone cheers the amount you set, the wheel spins on OBS with your prizes.',
+            title: 'Bits',
+            desc: 'When someone cheers the amount you set, react on OBS with a wheel, message, or image.',
+            reactionMode: 'Reaction',
+            reactionModeRoulette: 'Roulette',
+            reactionModeMessage: 'Message',
+            reactionModeImage: 'Image',
+            imageUrl: 'Image URL (https)',
+            imageUrlPlaceholder: 'https://example.com/image.png',
+            imageUrlError: 'Use a public URL starting with https:// (max 500 characters).',
+            messageTemplate: 'Message template',
+            messageTemplateHint: 'Placeholders: {name} and {bits}',
             triggerTitle: 'Trigger',
             enabled: 'Enable alert',
             threshold: 'Bits',
@@ -66,6 +75,80 @@ alerts: {
             spinBannerVars: 'Available variables:',
             spinBannerInsertVar: 'Insert {var}',
             spinBannerDefault: '{name} spun the wheel with {bits} bits'
+        },
+        eventAlert: {
+            follow: {
+                title: 'Follows',
+                desc: 'Announce in chat when someone new follows you.',
+                enabled: 'Enable alert',
+                enabledOn: 'Follow alert enabled',
+                enabledOff: 'Follow alert disabled',
+                reactionMode: 'Reaction',
+                reactionModeMessage: 'Message',
+                reactionModeImage: 'Image',
+                messageTemplate: 'Message template',
+                messageTemplateHint: 'Placeholders: {name}',
+                imageUrl: 'Image URL (https)',
+                imageUrlPlaceholder: 'https://example.com/image.png',
+                imageUrlError: 'Use a public URL starting with https://.',
+                imageStoredNote: 'Image is saved for a future overlay; only chat messages work today.',
+                overlayLaterNote:
+                    'Follow overlay is coming later. With Message mode the channel writes to chat on the event.',
+                hint: 'Needs EventSub in production (HTTPS). Locally the toggle saves prefs without listening to Twitch.',
+                save: 'Save',
+                saving: 'Saving…',
+                saved: 'Settings saved',
+                saveError: 'Could not save',
+                loadError: 'Could not load alert'
+            },
+            subscribe: {
+                title: 'Subs',
+                desc: 'Announce in chat on a new subscription.',
+                enabled: 'Enable alert',
+                enabledOn: 'Sub alert enabled',
+                enabledOff: 'Sub alert disabled',
+                reactionMode: 'Reaction',
+                reactionModeMessage: 'Message',
+                reactionModeImage: 'Image',
+                messageTemplate: 'Message template',
+                messageTemplateHint: 'Placeholders: {name}, {tier}',
+                imageUrl: 'Image URL (https)',
+                imageUrlPlaceholder: 'https://example.com/image.png',
+                imageUrlError: 'Use a public URL starting with https://.',
+                imageStoredNote: 'Image is saved for a future overlay; only chat messages work today.',
+                overlayLaterNote:
+                    'Sub overlay is coming later. With Message mode the channel writes to chat on the event.',
+                hint: 'Needs EventSub in production (HTTPS).',
+                save: 'Save',
+                saving: 'Saving…',
+                saved: 'Settings saved',
+                saveError: 'Could not save',
+                loadError: 'Could not load alert'
+            },
+            raid: {
+                title: 'Raids',
+                desc: 'Announce in chat when you receive a raid.',
+                enabled: 'Enable alert',
+                enabledOn: 'Raid alert enabled',
+                enabledOff: 'Raid alert disabled',
+                reactionMode: 'Reaction',
+                reactionModeMessage: 'Message',
+                reactionModeImage: 'Image',
+                messageTemplate: 'Message template',
+                messageTemplateHint: 'Placeholders: {name}, {viewers}',
+                imageUrl: 'Image URL (https)',
+                imageUrlPlaceholder: 'https://example.com/image.png',
+                imageUrlError: 'Use a public URL starting with https://.',
+                imageStoredNote: 'Image is saved for a future overlay; only chat messages work today.',
+                overlayLaterNote:
+                    'Raid overlay is coming later. With Message mode the channel writes to chat on the event.',
+                hint: 'Needs EventSub in production (HTTPS).',
+                save: 'Save',
+                saving: 'Saving…',
+                saved: 'Settings saved',
+                saveError: 'Could not save',
+                loadError: 'Could not load alert'
+            }
         }
     }
 };

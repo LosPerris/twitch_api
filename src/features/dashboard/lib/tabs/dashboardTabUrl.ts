@@ -26,6 +26,9 @@ const VALID_TABS: ReadonlySet<DashboardTab> = new Set([
     'slots',
     'questions',
     'bitsRoulette',
+    'alertFollow',
+    'alertSub',
+    'alertRaid',
     'settings'
 ]);
 
@@ -39,6 +42,19 @@ const BITS_TOOL_SLUGS: Record<string, DashboardTab> = {
 
 const BITS_TAB_SLUG: Partial<Record<DashboardTab, string>> = {
     bitsRoulette: 'roulette'
+};
+
+/** Alertas de eventos: `/dashboard/alerts/{slug}`. */
+const ALERTS_TOOL_SLUGS: Record<string, DashboardTab> = {
+    follow: 'alertFollow',
+    subscribe: 'alertSub',
+    raid: 'alertRaid'
+};
+
+const ALERTS_TAB_SLUG: Partial<Record<DashboardTab, string>> = {
+    alertFollow: 'follow',
+    alertSub: 'subscribe',
+    alertRaid: 'raid'
 };
 
 /** Pestañas antiguas → id actual. */
@@ -77,6 +93,8 @@ export function dashboardTabPath(tab: DashboardTab): string {
     if (tab === 'home') return base;
     const bitsSlug = BITS_TAB_SLUG[tab];
     if (bitsSlug) return `${base}/bits/${bitsSlug}`;
+    const alertsSlug = ALERTS_TAB_SLUG[tab];
+    if (alertsSlug) return `${base}/alerts/${alertsSlug}`;
     return `${base}/${tab}`;
 }
 
@@ -94,6 +112,10 @@ export function parseTabFromPathname(pathname: string): DashboardTab | null {
 
     if (segment === 'bits') {
         return BITS_TOOL_SLUGS[segments[1] ?? ''] ?? null;
+    }
+
+    if (segment === 'alerts') {
+        return ALERTS_TOOL_SLUGS[segments[1] ?? ''] ?? null;
     }
 
     return resolveLegacyTab(segment);
@@ -170,7 +192,7 @@ export function setTabInUrl(
 
     if (tab === 'home') {
         url.pathname = base;
-    } else if (BITS_TAB_SLUG[tab]) {
+    } else if (BITS_TAB_SLUG[tab] || ALERTS_TAB_SLUG[tab]) {
         url.pathname = dashboardTabPath(tab);
     } else if (tab === 'settings') {
         const fromPath = parseSettingsTabFromLocation(url.pathname, url.search);

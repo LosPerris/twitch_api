@@ -14,6 +14,7 @@ import { useRequiredSession } from '@/core/session/useSession';
 import { useTrendsController } from '@/features/tools/trends/hooks/useTrendsController';
 import { TrendsLeaderboardDisplay } from '@/features/tools/trends/TrendsLeaderboardDisplay';
 import { formatTrendsTime } from '@/features/tools/trends/TrackerRow';
+import { OverlayConnectionBadge } from '@/features/overlay/components/OverlayConnectionBadge';
 import { OverlayUrlButton } from '@/features/overlay/components/OverlayUrlButton';
 import { useOverlayPublish } from '@/features/overlay/hooks/useOverlayPublish';
 import { fadeIn, hoverSubtleIconBtn, toolPanelShell, toolHeaderIconBtn, toolConfigControl } from '@/core/utils/tw';
@@ -175,6 +176,7 @@ export function TrendsView({ active = true }: { active?: boolean }) {
                         >
                             <RotateCw className="size-4 shrink-0" />
                         </button>
+                        <OverlayConnectionBadge tool="trends" active={active} compact />
                         <OverlayUrlButton tool="trends" compact />
                         <InfoTooltip text={trends.tooltip} placement="bottom" />
                     </>

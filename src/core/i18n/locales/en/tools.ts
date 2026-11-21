@@ -20,6 +20,8 @@ tools: {
             btnStart: 'Start',
             btnReload: 'Clear',
             tooltip: 'Lists who is writing in chat in real time',
+            permissionsNeeded:
+                'Missing Twitch permission to read chatters. Reauthorize to scan chat.',
             table: {
                 user: 'User',
                 message: 'Message',
@@ -88,6 +90,8 @@ tools: {
             listUpdated: 'List updated',
             reloadUsers: 'Reload users',
             infoTooltip: "Pick a chat winner: everyone joins or with a keyword, and filter by roles",
+            permissionsNeeded:
+                'Missing Twitch permission to read chatters. Reauthorize to draw from chat.',
             spinBtn: 'Spin Roulette',
             twitchDelay: 'Twitch delay ~3s',
             waitingChat: 'Waiting for chat...',
@@ -108,6 +112,12 @@ tools: {
                 mods: 'Mods',
                 vips: 'VIPs',
                 viewers: 'Viewers'
+            },
+            guide: {
+                title: 'Giveaway steps',
+                stepEligibility: 'Eligibility',
+                stepSpin: 'Spin',
+                stepWinner: 'Winner'
             }
         },
         questions: {

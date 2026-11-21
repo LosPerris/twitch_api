@@ -65,6 +65,9 @@ const QuestionsView = lazy(() =>
 const BitsRouletteView = lazy(() =>
     import('@/features/alerts/views/BitsRouletteView').then((m) => ({ default: m.BitsRouletteView }))
 );
+const EventAlertView = lazy(() =>
+    import('@/features/alerts/views/EventAlertView').then((m) => ({ default: m.EventAlertView }))
+);
 
 interface DashboardContentProps {
     tab: DashboardTab;
@@ -85,6 +88,9 @@ function TabFallback({ tab }: { tab: DashboardTab }) {
     if (tab === 'clips') return <ClipsViewSkeleton />;
     if (tab === 'home') return <HomeViewSkeleton />;
     if (tab === 'bitsRoulette') return <BitsRouletteSkeleton />;
+    if (tab === 'alertFollow' || tab === 'alertSub' || tab === 'alertRaid') {
+        return <BitsRouletteSkeleton />;
+    }
     
     // Fallback genérico para vistas de comandos y minijuegos (Overlay, Magic8, Followage, etc.)
     return <CommandViewSkeleton />;
@@ -126,6 +132,12 @@ function renderTabPanel(tab: DashboardTab, { active, onNavigate }: TabPanelProps
             return <RouletteView active={active} />;
         case 'bitsRoulette':
             return <BitsRouletteView active={active} />;
+        case 'alertFollow':
+            return <EventAlertView kind="follow" active={active} />;
+        case 'alertSub':
+            return <EventAlertView kind="subscribe" active={active} />;
+        case 'alertRaid':
+            return <EventAlertView kind="raid" active={active} />;
         default:
             return null;
     }

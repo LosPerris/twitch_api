@@ -59,7 +59,7 @@ const BITS_ENTER_MS = 900;
 /** Duración de overlayPopOut. La entrada sigue en 0.45 s. */
 const BITS_POP_MS = 220;
 
-type BitsRoundPhase = 'idle' | 'enter' | 'spin' | 'result' | 'leave';
+type BitsRoundPhase = 'idle' | 'enter' | 'spin' | 'result' | 'react' | 'leave';
 
 function maxPrizesFromOverlayToken(token?: string): number {
     if (!token) return BITS_ROULETTE_OPTIONS_HARD_MAX;
@@ -227,6 +227,45 @@ function OverlayBitsRouletteContent({ session }: { session: Session }) {
 
         handledCheerId.current = cheer.id;
         lastSpinAt.current = now;
+
+        if (urlConfig.reactionMode === 'message' || urlConfig.reactionMode === 'image') {
+            if (urlConfig.reactionMode === 'image' && !urlConfig.imageUrl) {
+                handledCheerId.current = cheer.id;
+                return;
+            }
+            clearSpinTimers();
+            unlockBitsConfettiAudio();
+            playBitsConfettiSound(urlConfig.confettiSound);
+            if (
+                urlConfig.confetti &&
+                !(
+                    typeof window !== 'undefined' &&
+                    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+                )
+            ) {
+                void import('canvas-confetti').then(({ default: confetti }) => {
+                    confetti({
+                        particleCount: 120,
+                        spread: 80,
+                        origin: { y: 0.55 },
+                        colors: ['#9146ff', '#a78bfa', '#7c3aed', '#c4b5fd', '#6d28d9']
+                    });
+                });
+            }
+            setPhase('react');
+            setLocal((prev) => ({
+                ...prev,
+                winner: null,
+                isOpen: false,
+                isSpinning: false,
+                lastCheer: cheer,
+                spinSeq: Date.now(),
+                updatedAt: Date.now()
+            }));
+            armHide(winnerHoldMs);
+            return;
+        }
+
         clearSpinTimers();
         const token = ++roundTokenRef.current;
 
@@ -349,18 +388,108 @@ function OverlayBitsRouletteContent({ session }: { session: Session }) {
         isOpen: phase === 'enter'
     };
 
-    const visible = useRouletteOverlayVisible(display, winnerHoldMs);
+    const wheelVisible = useRouletteOverlayVisible(display, winnerHoldMs);
+    const isRouletteMode = urlConfig.reactionMode === 'roulette';
+    const visible = isRouletteMode ? wheelVisible : phase === 'react' || phase === 'leave';
 
     useEffect(() => {
-        if (visible || phase === 'enter' || phase === 'spin' || phase === 'leave') return;
+        if (!isRouletteMode) return;
+        if (wheelVisible || phase === 'enter' || phase === 'spin' || phase === 'leave') return;
         if (!local.winner && !local.isOpen && phase === 'idle') return;
         requestLeave();
-    }, [visible, phase, local.winner, local.isOpen, requestLeave]);
+    }, [isRouletteMode, wheelVisible, phase, local.winner, local.isOpen, requestLeave]);
 
-    if (!visible && phase !== 'leave') {
+    if (!visible) {
         return (
             <OverlayAppearanceRoot>
                 <div className="min-h-screen" aria-hidden />
+            </OverlayAppearanceRoot>
+        );
+    }
+
+    if (!isRouletteMode && display.lastCheer) {
+        const urlColor = safeOverlayUrlColor();
+        const bannerPalette = resolveWheelPalette(urlColor);
+        const messageParts =
+            urlConfig.reactionMode === 'message'
+                ? parseSpinBannerParts(
+                      urlConfig.messageTemplate,
+                      display.lastCheer.userName || '',
+                      display.lastCheer.bits
+                  )
+                : [];
+
+        return (
+            <OverlayAppearanceRoot>
+                <div className="flex min-h-screen items-center justify-center overflow-hidden p-4">
+                    <div className="flex flex-col items-center gap-2">
+                        <OverlayConnectionBanners
+                            connected={connected}
+                            stale={stale}
+                            unauthorized={unauthorized}
+                            retrying={retrying}
+                            onRetry={retry}
+                        />
+                        <div
+                            key={display.spinSeq || 'bits-react'}
+                            className={`origin-center motion-reduce:animate-none ${
+                                phase === 'leave'
+                                    ? 'motion-safe:animate-overlay-pop-out'
+                                    : 'motion-safe:animate-overlay-pop-in'
+                            }`}
+                        >
+                            {urlConfig.reactionMode === 'message' ? (
+                                <div
+                                    className="w-[min(100%,32rem)] rounded-xl border px-5 py-4 text-center"
+                                    role="status"
+                                    style={{
+                                        borderColor: bannerPalette.borderRgba,
+                                        backgroundColor:
+                                            urlConfig.cardStyle === 'solid'
+                                                ? `color-mix(in srgb, ${bannerPalette.primaryHex} 38%, #0a0a0f 62%)`
+                                                : bannerPalette.glowRgba
+                                                      .replace('0.45', '0.14')
+                                                      .replace('0.4', '0.14'),
+                                        boxShadow:
+                                            urlConfig.cardStyle === 'solid'
+                                                ? `0 8px 24px color-mix(in srgb, ${bannerPalette.primaryHex} 26%, transparent)`
+                                                : undefined
+                                    }}
+                                >
+                                    <p className="text-[1.15rem] font-semibold leading-snug text-white">
+                                        {messageParts.map((part, i) =>
+                                            part.type === 'var' ? (
+                                                <span
+                                                    key={`${part.key}-${i}`}
+                                                    className="font-extrabold"
+                                                    style={{ color: bannerPalette.primaryHex }}
+                                                >
+                                                    {part.value}
+                                                </span>
+                                            ) : (
+                                                <span key={`t-${i}`}>{part.value}</span>
+                                            )
+                                        )}
+                                    </p>
+                                    {urlConfig.showDonor && display.lastCheer.userName ? (
+                                        <p className="mt-2 text-[0.8rem] text-white/75">
+                                            {aT.donorLabel.replace(
+                                                '{name}',
+                                                display.lastCheer.userName
+                                            )}
+                                        </p>
+                                    ) : null}
+                                </div>
+                            ) : (
+                                <img
+                                    src={urlConfig.imageUrl}
+                                    alt=""
+                                    className="max-h-[min(80vh,32rem)] max-w-[min(100%,42rem)] object-contain"
+                                />
+                            )}
+                        </div>
+                    </div>
+                </div>
             </OverlayAppearanceRoot>
         );
     }

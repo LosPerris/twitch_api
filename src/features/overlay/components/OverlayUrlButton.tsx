@@ -20,6 +20,7 @@ export function OverlayUrlButton({
         <>
             <button
                 type="button"
+                data-tour="overlay-setup"
                 onClick={() => setOpen(true)}
                 title={bT.title}
                 aria-label={bT.aria}

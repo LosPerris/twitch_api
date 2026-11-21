@@ -1,9 +1,11 @@
 import { Dices, History, Loader2, MessageSquare, Pause, Play, RotateCw, Trash2 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { Fragment, useEffect, useRef } from 'react';
 import { useRequiredSession } from '@/core/session/useSession';
 import { useRouletteController } from '@/features/tools/roulette/hooks/useRouletteController';
 import { RouletteWheelDisplay } from '@/features/tools/roulette/RouletteWheelDisplay';
+import { OverlayConnectionBadge } from '@/features/overlay/components/OverlayConnectionBadge';
 import { OverlayUrlButton } from '@/features/overlay/components/OverlayUrlButton';
+import { UpdateTwitchPermissionsCallout } from '@/features/dashboard/components/UpdateTwitchPermissions';
 import { useOverlayPublish } from '@/features/overlay/hooks/useOverlayPublish';
 import { fadeIn, hoverSubtleIconBtn, toolPanelShell, toolHeaderIconBtn, toolConfigInput, toolConfigSegment } from '@/core/utils/tw';
 import { EligibilityDropdown } from '@/features/tools/components/EligibilityDropdown';
@@ -69,6 +71,13 @@ export function RouletteView({ active = true }: { active?: boolean }) {
     }, [chatters]);
 
     const entryLocked = isOpen || isSpinning;
+
+    const guideStep = winner ? 3 : chatters.length > 0 ? 2 : 1;
+    const guideSteps = [
+        { n: 1, label: rlT.guide.stepEligibility },
+        { n: 2, label: rlT.guide.stepSpin },
+        { n: 3, label: rlT.guide.stepWinner }
+    ] as const;
 
     return (
         <div className={`${toolPanelShell(focusMode)} ${focusMode ? '' : fadeIn}`}>
@@ -187,6 +196,7 @@ export function RouletteView({ active = true }: { active?: boolean }) {
                                 <RotateCw className="size-4" />
                             </button>
                         ) : null}
+                        <OverlayConnectionBadge tool="roulette" active={active} compact />
                         <OverlayUrlButton tool="roulette" compact />
                         <InfoTooltip text={rlT.infoTooltip} />
                     </>
@@ -198,6 +208,54 @@ export function RouletteView({ active = true }: { active?: boolean }) {
                     focusMode ? 'flex flex-col' : ''
                 }`}
             >
+                <UpdateTwitchPermissionsCallout
+                    hints={['chatters']}
+                    message={rlT.permissionsNeeded}
+                    className="mb-4"
+                />
+                {!focusMode ? (
+                    <nav
+                        aria-label={rlT.guide.title}
+                        className="mb-4 flex items-center justify-center gap-1 rounded-xl border border-border-subtle bg-bg-secondary/80 px-2 py-2"
+                    >
+                        {guideSteps.map(({ n, label }, idx) => {
+                            const active = guideStep === n;
+                            const done = guideStep > n;
+                            return (
+                                <Fragment key={n}>
+                                    <span
+                                        className={`inline-flex min-w-0 flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-[0.65rem] font-semibold uppercase tracking-wide transition sm:text-[0.7rem] ${
+                                            active
+                                                ? 'bg-primary/15 text-primary'
+                                                : done
+                                                  ? 'text-success'
+                                                  : 'text-text-muted'
+                                        }`}
+                                    >
+                                        <span
+                                            className={`inline-flex size-5 shrink-0 items-center justify-center rounded-full text-[0.6rem] ${
+                                                active
+                                                    ? 'bg-primary text-white'
+                                                    : done
+                                                      ? 'bg-success/20 text-success'
+                                                      : 'bg-white/[0.06]'
+                                            }`}
+                                        >
+                                            {n}
+                                        </span>
+                                        <span className="truncate">{label}</span>
+                                    </span>
+                                    {idx < guideSteps.length - 1 ? (
+                                        <span
+                                            className="hidden h-px w-3 shrink-0 bg-border-subtle sm:block"
+                                            aria-hidden
+                                        />
+                                    ) : null}
+                                </Fragment>
+                            );
+                        })}
+                    </nav>
+                ) : null}
                 <div
                     className={
                         focusMode

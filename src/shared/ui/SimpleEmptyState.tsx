@@ -1,17 +1,21 @@
 import type { LucideIcon } from 'lucide-react';
 
+import type { ReactNode } from 'react';
+
 type SimpleEmptyStateProps = {
     icon: LucideIcon;
     label: string;
     description?: string;
+    action?: ReactNode;
     className?: string;
 };
 
-/** Empty simple: icono + una línea (y opcional subtítulo) centrados. */
+/** Empty simple: icono + una línea (y opcional subtítulo/CTA) centrados. */
 export function SimpleEmptyState({
     icon: Icon,
     label,
     description,
+    action,
     className = ''
 }: SimpleEmptyStateProps) {
     return (
@@ -25,6 +29,7 @@ export function SimpleEmptyState({
                     {description}
                 </p>
             ) : null}
+            {action ? <div className="mt-4 flex flex-wrap items-center justify-center gap-2">{action}</div> : null}
         </div>
     );
 }

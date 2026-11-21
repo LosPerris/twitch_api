@@ -7,6 +7,13 @@ import {
     handleCheerNotification
 } from './bitsRoulette.service';
 import { revokeBitsAlertSubscription } from './bitsRoulette.store';
+import { eventsubTypeToKind } from './eventAlert.logic';
+import {
+    handleFollowNotification,
+    handleRaidNotification,
+    handleSubscribeNotification
+} from './eventAlert.service';
+import { revokeEventAlertSubscription } from './eventAlert.store';
 
 type TwitchHeaders = {
     id?: string;
@@ -149,7 +156,12 @@ export async function twitchEventSubWebhook(req: Request, res: Response) {
         });
         if (broadcasterUserId) {
             try {
-                await revokeBitsAlertSubscription(broadcasterUserId);
+                const kind = eventsubTypeToKind(sub.type || '');
+                if (kind) {
+                    await revokeEventAlertSubscription(broadcasterUserId, kind);
+                } else if (sub.type === 'channel.cheer') {
+                    await revokeBitsAlertSubscription(broadcasterUserId);
+                }
             } catch (err) {
                 logger.error('EventSub revocation persist', err);
                 await cacheDel(dedupKey(headers.id));
@@ -188,6 +200,80 @@ export async function twitchEventSubWebhook(req: Request, res: Response) {
                 });
             } catch (err) {
                 logger.error('channel.cheer handler', err);
+                await cacheDel(dedupKey(headers.id));
+                devSeen.delete(headers.id);
+                return res.status(500).end();
+            }
+        }
+    }
+
+    if (subType === 'channel.follow') {
+        const event = (body.event || {}) as {
+            broadcaster_user_id?: string;
+            user_name?: string;
+            user_login?: string;
+        };
+        const broadcasterUserId = String(event.broadcaster_user_id || '');
+        if (broadcasterUserId) {
+            try {
+                await handleFollowNotification({
+                    messageId: headers.id,
+                    broadcasterUserId,
+                    userName: event.user_name || event.user_login
+                });
+            } catch (err) {
+                logger.error('channel.follow handler', err);
+                await cacheDel(dedupKey(headers.id));
+                devSeen.delete(headers.id);
+                return res.status(500).end();
+            }
+        }
+    }
+
+    if (subType === 'channel.subscribe') {
+        const event = (body.event || {}) as {
+            broadcaster_user_id?: string;
+            user_name?: string;
+            user_login?: string;
+            tier?: string;
+        };
+        const broadcasterUserId = String(event.broadcaster_user_id || '');
+        if (broadcasterUserId) {
+            try {
+                await handleSubscribeNotification({
+                    messageId: headers.id,
+                    broadcasterUserId,
+                    userName: event.user_name || event.user_login,
+                    tier: event.tier
+                });
+            } catch (err) {
+                logger.error('channel.subscribe handler', err);
+                await cacheDel(dedupKey(headers.id));
+                devSeen.delete(headers.id);
+                return res.status(500).end();
+            }
+        }
+    }
+
+    if (subType === 'channel.raid') {
+        const event = (body.event || {}) as {
+            to_broadcaster_user_id?: string;
+            from_broadcaster_user_name?: string;
+            from_broadcaster_user_login?: string;
+            viewers?: number;
+        };
+        const broadcasterUserId = String(event.to_broadcaster_user_id || '');
+        const viewers = Number(event.viewers) || 0;
+        if (broadcasterUserId) {
+            try {
+                await handleRaidNotification({
+                    messageId: headers.id,
+                    broadcasterUserId,
+                    userName: event.from_broadcaster_user_name || event.from_broadcaster_user_login,
+                    viewers
+                });
+            } catch (err) {
+                logger.error('channel.raid handler', err);
                 await cacheDel(dedupKey(headers.id));
                 devSeen.delete(headers.id);
                 return res.status(500).end();

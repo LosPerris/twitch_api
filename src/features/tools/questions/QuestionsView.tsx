@@ -6,6 +6,7 @@ import { QuestionsHistoryModal } from './components/QuestionsHistoryModal';
 import { ToolPanelHeader } from '@/features/tools/components/ToolPanelHeader';
 import { ToolMoreMenu } from '@/features/tools/components/ToolMoreMenu';
 import { EligibilityDropdown } from '@/features/tools/components/EligibilityDropdown';
+import { OverlayConnectionBadge } from '@/features/overlay/components/OverlayConnectionBadge';
 import { OverlayUrlButton } from '@/features/overlay/components/OverlayUrlButton';
 import { useOverlayPublish } from '@/features/overlay/hooks/useOverlayPublish';
 import { toolPanelShell, fadeIn, toolConfigInput, toolHeaderIconBtn } from '@/core/utils/tw';
@@ -165,6 +166,7 @@ export function QuestionsView({ active = true }: { active?: boolean }) {
                 }
                 trailing={
                     <>
+                        <OverlayConnectionBadge tool="questions" active={active} compact />
                         <OverlayUrlButton tool="questions" compact />
                         <ToolMoreMenu items={moreItems} helpText={qT.tooltip} />
                     </>
