@@ -20,6 +20,17 @@ describe('Integration: Rutas del sistema', () => {
         });
     });
 
+    describe('GET /api/system/health?probe=live', () => {
+        it('liveness público con versión (sin auth)', async () => {
+            const res = await request(app).get('/api/system/health?probe=live');
+            expect(res.status).toBe(200);
+            expect(res.body.status).toBe('alive');
+            expect(res.body.probe).toBe('liveness');
+            expect(typeof res.body.version).toBe('string');
+            expect(res.body.version.length).toBeGreaterThan(0);
+        });
+    });
+
     describe('GET /robots.txt', () => {
         it('debe responder con Content-Type text/plain', async () => {
             const res = await request(app).get('/robots.txt');

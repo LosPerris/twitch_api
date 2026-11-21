@@ -146,7 +146,7 @@ test.describe('dashboard', () => {
     test('redirects unauthenticated users to landing', async ({ page }) => {
         await page.goto('/dashboard/');
         await expect(page).toHaveURL(/^(?:http:\/\/(?:localhost|127\.0\.0\.1):\d+)\/?$/);
-        await expect(page.getByRole('button', { name: /Twitch/i })).toBeVisible();
+        await expect(page.locator('[data-lp-auth="guest"]').first()).toBeVisible();
     });
 
     test('legacy ?tab= migrates to path-based URL', async ({ page }) => {

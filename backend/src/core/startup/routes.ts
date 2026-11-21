@@ -1,6 +1,7 @@
-import { Application, Request, Response } from 'express';
+import { Application, NextFunction, Request, Response } from 'express';
 import { timed, logColdStart } from '../utils/timing';
 import { CONFIG } from '../config/env';
+import { APP_VERSION } from '../config/appVersion';
 import { preAuthRateLimiter } from '../middleware/redisRateLimiter';
 import { apiKeyValidator } from '../middleware/apiKeyValidator';
 import checkToken from '../middleware/authMiddleware';
@@ -48,6 +49,22 @@ export const configureRoutes = (app: Application) => {
             timestamp: new Date().toISOString()
         });
     });
+
+    app.get(
+        ['/api/system/health', '/system/health'],
+        preAuthRateLimiter,
+        /* codeql[js/missing-rate-limiting] */ (req: Request, res: Response, next: NextFunction) => {
+            if (req.query.probe === 'live') {
+                return res.status(200).json({
+                    status: 'alive',
+                    probe: 'liveness',
+                    timestamp: new Date().toISOString(),
+                    version: APP_VERSION
+                });
+            }
+            return next();
+        }
+    );
 
     app.get(['/robots.txt', '/api/robots.txt'], preAuthRateLimiter, /* codeql[js/missing-rate-limiting] */ getRobotsTxt);
     app.get(['/sitemap.xml', '/api/sitemap.xml'], preAuthRateLimiter, /* codeql[js/missing-rate-limiting] */ getSitemapXml);
